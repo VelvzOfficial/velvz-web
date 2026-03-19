@@ -24,13 +24,13 @@
     <p class="date">Última actualización: 19 de marzo de 2026</p>
 
     <h2>1. Responsable del tratamiento</h2>
-    <p>Alejandro De La Peña ("nosotros", "Velvz") es responsable del tratamiento de tus datos personales. Puedes contactarnos en <a href="mailto:adlpr@outlook.com">adlpr@outlook.com</a>.</p>
+    <p>Alejandro De La Peña ("nosotros", "Velvz") es responsable del tratamiento de tus datos personales. Puedes contactarnos en <a href="mailto:main@velvz.com">main@velvz.com</a>.</p>
 
     <h2>2. Qué datos recogemos</h2>
     <ul>
         <li><strong>Perfil básico</strong>: nombre, país, situación laboral, rango de ingresos y objetivo financiero. Los proporcionas voluntariamente durante la configuración.</li>
-        <li><strong>Datos bancarios</strong>: saldos y transacciones de las cuentas que conectes voluntariamente a través de Open Banking (PSD2). Solo accedemos en modo lectura — nunca podemos mover tu dinero.</li>
-        <li><strong>Conversaciones con la IA</strong>: los mensajes que envías al asistente financiero se procesan a través de la API de Claude (Anthropic) con retención de datos cero — Anthropic no almacena tus conversaciones.</li>
+        <li><strong>Datos bancarios</strong>: saldos y transacciones de las cuentas que conectes voluntariamente. Accedemos a estos datos mediante la interfaz de banca abierta (Open Banking) que la normativa europea PSD2 obliga a todos los bancos a ofrecer. El acceso es exclusivamente de lectura — nunca podemos realizar operaciones, pagos ni transferencias en tu cuenta.</li>
+        <li><strong>Conversaciones con la IA</strong>: los mensajes que envías al asistente financiero se procesan a través de la API de Claude (Anthropic). Por defecto, Anthropic puede retener estos datos hasta 30 días con fines de seguridad, aunque no los utiliza para entrenar modelos de IA. Estamos trabajando para implementar la retención cero de datos (Zero Data Retention) con Anthropic, lo que eliminará cualquier retención temporal.</li>
     </ul>
 
     <h2>3. Dónde se almacenan tus datos</h2>
@@ -40,16 +40,16 @@
         <li>Conectar con tu banco a través de Enable Banking (proveedor autorizado PSD2)</li>
         <li>Procesar tus mensajes con la IA (Claude API)</li>
     </ul>
-    <p>El servidor no persiste datos bancarios — los transmite a tu dispositivo, donde se guardan en iCloud.</p>
+    <p>El servidor no persiste datos bancarios ni financieros. Los datos se transmiten a tu dispositivo en tránsito y se almacenan en tu iCloud. El servidor puede generar registros técnicos (logs) que contienen información operativa (como códigos de estado y URLs de las peticiones), pero estos no incluyen el contenido de tus transacciones, saldos ni mensajes.</p>
 
-    <h2>4. Conexión bancaria (Open Banking)</h2>
-    <p>Utilizamos <strong>Enable Banking</strong>, un proveedor autorizado de servicios de información de cuentas (AISP), para conectar con tu banco. El proceso:</p>
+    <h2>4. Conexión bancaria (Open Banking / PSD2)</h2>
+    <p>Utilizamos <strong>Enable Banking</strong>, un proveedor autorizado de servicios de información de cuentas (AISP), para conectar con tu banco a través de la interfaz de banca abierta que la Directiva Europea de Servicios de Pago (PSD2) obliga a ofrecer a todas las entidades bancarias.</p>
+    <p>El proceso:</p>
     <ul>
-        <li>Tú autorizas la conexión directamente en la web de tu banco</li>
-        <li>Solo accedemos a saldos y transacciones (lectura)</li>
+        <li>Tú autorizas la conexión directamente en la web de tu banco — nosotros nunca vemos tus credenciales</li>
+        <li>La conexión es exclusivamente de <strong>solo lectura</strong> (Account Information Service). No es posible realizar pagos, transferencias ni ninguna operación en tu cuenta</li>
         <li>La autorización dura un máximo de 180 días, tras los cuales debes renovarla</li>
-        <li>Puedes desconectar tu banco en cualquier momento desde la app</li>
-        <li>Nunca tenemos acceso a tus credenciales bancarias</li>
+        <li>Puedes desconectar tu banco en cualquier momento desde la app, revocando el acceso inmediatamente</li>
     </ul>
 
     <h2>5. Base legal</h2>
@@ -61,15 +61,15 @@
 
     <h2>6. Con quién compartimos datos</h2>
     <ul>
-        <li><strong>Enable Banking Oy</strong> (Finlandia) — intermediario bancario PSD2</li>
-        <li><strong>Anthropic</strong> (EE.UU.) — procesamiento de IA con retención cero de datos</li>
-        <li><strong>Apple</strong> — almacenamiento en iCloud (cifrado, controlado por ti)</li>
-        <li><strong>Railway</strong> (EE.UU.) — hosting del servidor backend (no persiste datos bancarios)</li>
+        <li><strong>Enable Banking Oy</strong> (Finlandia) — intermediario bancario autorizado PSD2. Actúa como pasarela técnica para acceder a la API de banca abierta de tu banco</li>
+        <li><strong>Anthropic</strong> (EE.UU.) — procesamiento de IA. Los datos enviados pueden ser retenidos hasta 30 días con fines de seguridad (no se usan para entrenamiento). Estamos en proceso de implementar retención cero</li>
+        <li><strong>Apple</strong> — almacenamiento en iCloud (cifrado de extremo a extremo, controlado por ti)</li>
+        <li><strong>Railway</strong> (EE.UU.) — hosting del servidor backend. No persiste datos financieros; solo procesa peticiones en tránsito</li>
     </ul>
-    <p>No vendemos ni compartimos tus datos con terceros para fines publicitarios.</p>
+    <p>No vendemos, cedemos ni compartimos tus datos con terceros para fines publicitarios, de marketing ni de perfilado comercial.</p>
 
     <h2>7. Transferencias internacionales</h2>
-    <p>Algunos proveedores están fuera del EEE. Las transferencias se realizan bajo cláusulas contractuales tipo aprobadas por la Comisión Europea o decisiones de adecuación.</p>
+    <p>Algunos proveedores (Anthropic, Railway) están ubicados en Estados Unidos, fuera del Espacio Económico Europeo. Las transferencias se realizan bajo cláusulas contractuales tipo aprobadas por la Comisión Europea o decisiones de adecuación, conforme al capítulo V del RGPD.</p>
 
     <h2>8. Tus derechos (RGPD)</h2>
     <p>Tienes derecho a:</p>
@@ -81,7 +81,7 @@
         <li>Portabilidad de tus datos</li>
         <li>Retirar tu consentimiento en cualquier momento</li>
     </ul>
-    <p>Para ejercer estos derechos, contacta con <a href="mailto:adlpr@outlook.com">adlpr@outlook.com</a>.</p>
+    <p>Para ejercer estos derechos, contacta con <a href="mailto:main@velvz.com">main@velvz.com</a>.</p>
     <p>También puedes presentar una reclamación ante la <a href="https://www.aepd.es">Agencia Española de Protección de Datos (AEPD)</a>.</p>
 
     <h2>9. Seguridad</h2>
