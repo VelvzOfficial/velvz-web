@@ -31,6 +31,7 @@
         <li><strong>Perfil básico</strong>: nombre, país, situación laboral, rango de ingresos y objetivo financiero. Los proporcionas voluntariamente durante la configuración.</li>
         <li><strong>Datos bancarios</strong>: saldos y transacciones de las cuentas que conectes voluntariamente. Accedemos a estos datos mediante la interfaz de banca abierta (Open Banking) que la normativa europea PSD2 obliga a todos los bancos a ofrecer. El acceso es exclusivamente de lectura — nunca podemos realizar operaciones, pagos ni transferencias en tu cuenta.</li>
         <li><strong>Conversaciones con la IA</strong>: los mensajes que envías al asistente financiero se procesan a través de la API de Claude (Anthropic). Por defecto, Anthropic puede retener estos datos hasta 30 días con fines de seguridad, aunque no los utiliza para entrenar modelos de IA.</li>
+        <li><strong>Imágenes y documentos adjuntos al chat</strong>: si adjuntas un recibo, factura, foto o extracto al asistente, los bytes se guardan exclusivamente en tu iCloud privada (no en nuestros servidores) y se envían a Anthropic únicamente durante el análisis del mensaje en el que los adjuntas. En turnos posteriores el asistente sólo conoce metadatos ligeros (nombre de archivo, fecha y una etiqueta descriptiva generada al analizar la imagen) para poder referirse a ella; para volver a ver su contenido visual deberás adjuntarla de nuevo.</li>
     </ul>
 
     <h2>3. Dónde se almacenan tus datos</h2>
