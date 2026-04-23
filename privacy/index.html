@@ -30,7 +30,7 @@
     <ul>
         <li><strong>Perfil básico</strong>: nombre, país, situación laboral, rango de ingresos y objetivo financiero. Los proporcionas voluntariamente durante la configuración.</li>
         <li><strong>Datos bancarios</strong>: saldos y transacciones de las cuentas que conectes voluntariamente. Accedemos a estos datos mediante la interfaz de banca abierta (Open Banking) que la normativa europea PSD2 obliga a todos los bancos a ofrecer. El acceso es exclusivamente de lectura — nunca podemos realizar operaciones, pagos ni transferencias en tu cuenta.</li>
-        <li><strong>Conversaciones con la IA</strong>: los mensajes que envías al asistente financiero se procesan a través de la API de Claude (Anthropic). Por defecto, Anthropic puede retener estos datos hasta 30 días con fines de seguridad, aunque no los utiliza para entrenar modelos de IA. Estamos trabajando para implementar la retención cero de datos (Zero Data Retention) con Anthropic, lo que eliminará cualquier retención temporal.</li>
+        <li><strong>Conversaciones con la IA</strong>: los mensajes que envías al asistente financiero se procesan a través de la API de Claude (Anthropic). Por defecto, Anthropic puede retener estos datos hasta 30 días con fines de seguridad, aunque no los utiliza para entrenar modelos de IA.</li>
     </ul>
 
     <h2>3. Dónde se almacenan tus datos</h2>
@@ -62,7 +62,7 @@
     <h2>6. Con quién compartimos datos</h2>
     <ul>
         <li><strong>Enable Banking Oy</strong> (Finlandia) — intermediario bancario autorizado PSD2. Actúa como pasarela técnica para acceder a la API de banca abierta de tu banco</li>
-        <li><strong>Anthropic</strong> (EE.UU.) — procesamiento de IA. Los datos enviados pueden ser retenidos hasta 30 días con fines de seguridad (no se usan para entrenamiento). Estamos en proceso de implementar retención cero</li>
+        <li><strong>Anthropic</strong> (EE.UU.) — procesamiento de IA. Los datos enviados pueden ser retenidos hasta 30 días con fines de seguridad (no se usan para entrenamiento).</li>
         <li><strong>Apple</strong> — almacenamiento en iCloud (cifrado de extremo a extremo, controlado por ti)</li>
         <li><strong>Railway</strong> (EE.UU.) — hosting del servidor backend. No persiste datos financieros; solo procesa peticiones en tránsito</li>
     </ul>
