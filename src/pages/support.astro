@@ -1,0 +1,49 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Soporte — Velvz" description="Soporte de Velvz: contacto, preguntas frecuentes sobre seguridad, datos y conexión bancaria.">
+  <main class="legal">
+    <a href="/" class="legal__back">&larr; Velvz</a>
+    <h1>Soporte</h1>
+
+    <h2>Contacto</h2>
+    <p>Si tienes problemas con la app, preguntas o sugerencias, contacta con nosotros:</p>
+
+    <div class="legal__card">
+      <p><strong>Email</strong></p>
+      <p><a href="mailto:contact@velvz.com">contact@velvz.com</a></p>
+      <p style="margin-top:14px"><strong>Tiempo de respuesta</strong></p>
+      <p>Intentamos responder en 24-48 horas laborables.</p>
+    </div>
+
+    <h2>Preguntas frecuentes</h2>
+
+    <h2>¿Es seguro conectar mi banco?</h2>
+    <p>Sí. Utilizamos Open Banking (PSD2), el estándar europeo regulado. Solo accedemos a tus datos en modo lectura a través de Enable Banking, un proveedor autorizado. Nunca tenemos acceso a tus credenciales bancarias ni podemos realizar operaciones en tu cuenta.</p>
+
+    <h2>¿Dónde se guardan mis datos?</h2>
+    <p>En tu iCloud privado (Apple CloudKit). Nosotros no almacenamos datos financieros en nuestros servidores. Tus datos son tuyos y están cifrados por Apple.</p>
+
+    <h2>¿Cómo desconecto mi banco?</h2>
+    <p>Desde la sección de cuentas bancarias en la app, pulsa "Desconectar". La autorización se revoca inmediatamente.</p>
+
+    <h2>¿Puedo eliminar mis datos?</h2>
+    <p>Sí. En la app, ve a <strong>Ajustes → Privacidad e IA → Eliminar todos mis datos</strong>. La acción borra inmediatamente movimientos, suscripciones, libros, widgets y categorías personalizadas. Es irreversible.</p>
+    <p>Si prefieres una eliminación completa también del lado servidor, escríbenos a <a href="mailto:contact@velvz.com">contact@velvz.com</a> y la procesamos manualmente.</p>
+
+    <h2>¿Cómo descargo todos mis datos?</h2>
+    <p>Ve a <strong>Ajustes → Privacidad e IA → Exportar mis datos</strong>. La app genera un archivo JSON con tu perfil, movimientos, suscripciones, libros, widgets, categorías y referencias a tus archivos. Puedes guardarlo donde quieras desde el panel de exportación.</p>
+  </main>
+</Layout>
+
+<style>
+  .legal__card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px 28px;
+    margin: 16px 0 8px;
+  }
+  .legal__card p { margin-bottom: 6px; }
+</style>

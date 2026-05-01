@@ -1,0 +1,164 @@
+---
+---
+
+<header class="header">
+  <div class="header__inner">
+    <a href="#top" class="header__brand" aria-label="Velvz inicio">
+      <img src="/velvz-icon.png" alt="" class="header__logo" width="32" height="32" />
+      <span class="header__wordmark">Velvz</span>
+    </a>
+
+    <nav class="header__nav" aria-label="Secciones">
+      <a href="#copiloto">Copiloto</a>
+      <a href="#datos">Datos</a>
+      <a href="#suscripciones">Suscripciones</a>
+      <a href="#privacidad">Privacidad</a>
+    </nav>
+
+    <a href="#waitlist" class="header__cta">
+      <span>Solicitar beta</span>
+      <span class="header__cta-arrow" aria-hidden="true">→</span>
+    </a>
+  </div>
+</header>
+
+<style>
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    /* IMPORTANTE: el border-bottom existe siempre con color transparente.
+       Cuando se activa is-scrolled, solo cambia el `border-color`, que sí
+       transiciona suave. Si dejábamos el border SIN definir en el estado
+       inicial, al añadir el estilo "1px solid X" el navegador pinta la
+       línea instantáneamente con color completo (de ahí el flash) y luego
+       intentaba transicionar desde nada → no hay nada que interpolar. */
+    border-bottom: 1px solid transparent;
+    transition:
+      background 0.4s ease,
+      border-color 0.4s ease,
+      backdrop-filter 0.4s ease;
+  }
+
+  :global(.header.is-scrolled) {
+    background: rgba(5, 5, 7, 0.7);
+    backdrop-filter: blur(22px) saturate(160%);
+    -webkit-backdrop-filter: blur(22px) saturate(160%);
+    border-bottom-color: var(--border);
+  }
+
+  /* 3 columnas iguales → el nav del medio queda CENTRADO en el viewport.
+     Con `auto 1fr auto` el nav quedaba "entre" el logo y el CTA, pero no
+     en el centro real (los anchos de logo y CTA no son iguales). */
+  .header__inner {
+    max-width: var(--container-wide);
+    margin: 0 auto;
+    padding: 16px 28px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
+    gap: 32px;
+  }
+  .header__inner > .header__brand { justify-self: start; }
+  .header__inner > .header__nav   { justify-self: center; }
+  .header__inner > .header__cta   { justify-self: end; }
+
+  .header__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text);
+    transition: opacity 0.2s ease;
+  }
+  .header__brand:hover { opacity: 0.85; }
+
+  .header__logo {
+    width: 32px;
+    height: 32px;
+    display: block;
+    /* El PNG ya trae el rounded square horneado en el alfa, así que no
+       hace falta border-radius. image-rendering ayuda a que se mantenga
+       nítido a tamaño pequeño en pantallas no-retina. */
+    image-rendering: -webkit-optimize-contrast;
+  }
+
+  .header__wordmark {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 0.005em;
+  }
+
+  .header__nav {
+    display: flex;
+    justify-content: center;
+    gap: 28px;
+    font-size: 13.5px;
+    color: var(--text-muted);
+  }
+  .header__nav a {
+    position: relative;
+    transition: color 0.2s ease;
+  }
+  .header__nav a:hover { color: var(--text); }
+  .header__nav a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -4px;
+    height: 1px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .header__nav a:hover::after { transform: scaleX(1); }
+
+  .header__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  }
+  .header__cta:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.22);
+    transform: translateY(-1px);
+  }
+  .header__cta-arrow {
+    display: inline-block;
+    transition: transform 0.2s ease;
+  }
+  .header__cta:hover .header__cta-arrow { transform: translateX(3px); }
+
+  @media (max-width: 880px) {
+    .header__nav { display: none; }
+    .header__inner { grid-template-columns: auto auto; justify-content: space-between; }
+  }
+  @media (max-width: 540px) {
+    .header__inner { padding: 12px 18px; }
+    .header__cta { padding: 8px 14px; font-size: 12px; }
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    const header = document.querySelector('.header');
+    if (!header) return;
+    const onScroll = () => {
+      if (window.scrollY > 12) header.classList.add('is-scrolled');
+      else header.classList.remove('is-scrolled');
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+  })();
+</script>

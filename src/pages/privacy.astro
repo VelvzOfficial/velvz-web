@@ -1,0 +1,143 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Política de Privacidad — Velvz" description="Cómo Velvz trata tus datos: PSD2 solo lectura, almacenamiento en tu iCloud, RGPD aplicable.">
+  <main class="legal">
+    <a href="/" class="legal__back">&larr; Velvz</a>
+    <h1>Política de Privacidad</h1>
+    <p class="legal__date">Última actualización: 25 de abril de 2026</p>
+
+    <h2>1. Responsable del tratamiento</h2>
+    <p>Alejandro De La Peña ("nosotros", "Velvz") es responsable del tratamiento de tus datos personales. Puedes contactarnos en <a href="mailto:contact@velvz.com">contact@velvz.com</a>.</p>
+
+    <h2>2. Qué datos recogemos</h2>
+    <ul>
+      <li><strong>Perfil básico</strong>: nombre, país, situación laboral, rango de ingresos y objetivo financiero. Los proporcionas voluntariamente durante la configuración.</li>
+      <li><strong>Datos bancarios</strong>: saldos y transacciones de las cuentas que conectes voluntariamente. Accedemos a estos datos mediante la interfaz de banca abierta (Open Banking) que la normativa europea PSD2 obliga a todos los bancos a ofrecer. El acceso es exclusivamente de lectura — nunca podemos realizar operaciones, pagos ni transferencias en tu cuenta.</li>
+      <li><strong>Conversaciones con la IA</strong>: los mensajes que envías al asistente financiero se procesan a través de la API de Claude (Anthropic). Por defecto, Anthropic puede retener estos datos hasta 30 días con fines de seguridad, aunque no los utiliza para entrenar modelos de IA.</li>
+      <li><strong>Imágenes y documentos adjuntos al chat</strong>: si adjuntas un recibo, factura, foto o extracto al asistente, los bytes se guardan exclusivamente en tu iCloud privada (no en nuestros servidores) y se envían a Anthropic únicamente durante el análisis del mensaje en el que los adjuntas. En turnos posteriores el asistente sólo conoce metadatos ligeros (nombre de archivo, fecha y una etiqueta descriptiva generada al analizar la imagen) para poder referirse a ella; para volver a ver su contenido visual deberás adjuntarla de nuevo.</li>
+    </ul>
+
+    <h2>3. Dónde se almacenan tus datos</h2>
+    <p>Tus datos financieros se almacenan exclusivamente en <strong>tu cuenta de iCloud privada</strong> mediante Apple CloudKit. Nosotros no tenemos acceso a tu contenedor de iCloud ni almacenamos datos financieros en nuestros servidores.</p>
+    <p>Nuestro servidor backend actúa únicamente como intermediario para:</p>
+    <ul>
+      <li>Conectar con tu banco a través de Enable Banking (proveedor autorizado PSD2)</li>
+      <li>Procesar tus mensajes con la IA (Claude API)</li>
+    </ul>
+    <p>El servidor no persiste datos bancarios ni financieros. Los datos se transmiten a tu dispositivo en tránsito y se almacenan en tu iCloud. El servidor puede generar registros técnicos (logs) que contienen información operativa (como códigos de estado y URLs de las peticiones), pero estos no incluyen el contenido de tus transacciones, saldos ni mensajes.</p>
+
+    <h2>4. Conexión bancaria (Open Banking / PSD2)</h2>
+    <p>Utilizamos <strong>Enable Banking</strong>, un proveedor autorizado de servicios de información de cuentas (AISP), para conectar con tu banco a través de la interfaz de banca abierta que la Directiva Europea de Servicios de Pago (PSD2) obliga a ofrecer a todas las entidades bancarias.</p>
+    <p>El proceso:</p>
+    <ul>
+      <li>Tú autorizas la conexión directamente en la web de tu banco — nosotros nunca vemos tus credenciales</li>
+      <li>La conexión es exclusivamente de <strong>solo lectura</strong> (Account Information Service). No es posible realizar pagos, transferencias ni ninguna operación en tu cuenta</li>
+      <li>La autorización dura un máximo de 180 días, tras los cuales debes renovarla</li>
+      <li>Puedes desconectar tu banco en cualquier momento desde la app, revocando el acceso inmediatamente</li>
+    </ul>
+
+    <h2>5. Base legal</h2>
+    <p>Tratamos tus datos en base a:</p>
+    <ul>
+      <li><strong>Tu consentimiento</strong> (art. 6.1.a RGPD) al conectar tu banco y usar la app</li>
+      <li><strong>Ejecución del contrato</strong> (art. 6.1.b RGPD) para proporcionarte el servicio</li>
+    </ul>
+
+    <h2>6. Con quién compartimos datos</h2>
+    <ul>
+      <li><strong>Enable Banking Oy</strong> (Finlandia) — intermediario bancario autorizado PSD2. Actúa como pasarela técnica para acceder a la API de banca abierta de tu banco</li>
+      <li><strong>Anthropic</strong> (EE.UU.) — procesamiento de IA. Los datos enviados pueden ser retenidos hasta 30 días con fines de seguridad (no se usan para entrenamiento).</li>
+      <li><strong>Apple</strong> — almacenamiento en iCloud (cifrado de extremo a extremo, controlado por ti)</li>
+      <li><strong>Railway</strong> (EE.UU.) — hosting del servidor backend. No persiste datos financieros; solo procesa peticiones en tránsito</li>
+    </ul>
+    <p>No vendemos, cedemos ni compartimos tus datos con terceros para fines publicitarios, de marketing ni de perfilado comercial.</p>
+
+    <h2>7. Transferencias internacionales</h2>
+    <p>Algunos proveedores (Anthropic, Railway) están ubicados en Estados Unidos, fuera del Espacio Económico Europeo. Las transferencias se realizan bajo cláusulas contractuales tipo aprobadas por la Comisión Europea o decisiones de adecuación, conforme al capítulo V del RGPD.</p>
+
+    <h2>8. Tus derechos (RGPD)</h2>
+    <p>Tienes derecho a:</p>
+    <ul>
+      <li>Acceder a tus datos personales</li>
+      <li>Rectificar datos incorrectos</li>
+      <li>Solicitar la eliminación de tus datos</li>
+      <li>Oponerte al tratamiento</li>
+      <li>Portabilidad de tus datos</li>
+      <li>Retirar tu consentimiento en cualquier momento</li>
+    </ul>
+    <p>Tienes herramientas integradas en la app para ejercer los derechos más comunes sin necesidad de contactarnos:</p>
+    <ul>
+      <li><strong>Exportar tus datos</strong> (portabilidad): <em>Ajustes → Privacidad e IA → Exportar mis datos</em>. Genera un archivo JSON con todos los datos que la app tiene sobre ti.</li>
+      <li><strong>Eliminar todos tus datos</strong>: <em>Ajustes → Privacidad e IA → Eliminar todos mis datos</em>. Borra movimientos, suscripciones, libros, widgets y categorías personalizadas. La acción es inmediata e irreversible.</li>
+      <li><strong>Retirar el consentimiento de IA</strong>: <em>Ajustes → Privacidad e IA → Uso de IA (interruptor)</em>. La app sigue funcionando sin las funciones de IA (chat, análisis semanal, clasificación automática de movimientos).</li>
+    </ul>
+    <p>Para cualquier otro derecho o pregunta, contacta con <a href="mailto:contact@velvz.com">contact@velvz.com</a>.</p>
+    <p>También puedes presentar una reclamación ante la <a href="https://www.aepd.es">Agencia Española de Protección de Datos (AEPD)</a>.</p>
+
+    <h2>9. Seguridad</h2>
+    <p>Todas las comunicaciones utilizan cifrado TLS. Los datos en iCloud están cifrados por Apple. No almacenamos contraseñas bancarias ni datos financieros en nuestros servidores.</p>
+
+    <h2>10. Menores</h2>
+    <p>Velvz no está dirigida a menores de 16 años. No recogemos conscientemente datos de menores.</p>
+
+    <h2>11. Cambios</h2>
+    <p>Podemos actualizar esta política. Te notificaremos de cambios significativos a través de la app.</p>
+  </main>
+</Layout>
+
+<style is:global>
+  /* ── Estilos legales (compartidos por privacy/terms/support) ─────
+     Layout: max-width 720, dark theme con tokens del global. */
+  .legal {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+    line-height: 1.7;
+    color: var(--text-muted);
+  }
+  .legal__back {
+    display: inline-block;
+    margin-bottom: 32px;
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 15px;
+    transition: opacity 0.2s ease;
+  }
+  .legal__back:hover { opacity: 0.75; }
+  .legal h1 {
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .legal__date {
+    color: var(--text-subtle);
+    font-size: 14px;
+    margin-bottom: 40px;
+  }
+  .legal h2 {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    margin: 36px 0 12px;
+  }
+  .legal p,
+  .legal li {
+    font-size: 15px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .legal ul { padding-left: 22px; }
+  .legal a {
+    color: var(--accent);
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+  .legal a:hover { opacity: 0.75; text-decoration: underline; }
+  .legal strong { color: var(--text); font-weight: 600; }
+  .legal em { color: var(--text); font-style: normal; font-weight: 500; }
+</style>

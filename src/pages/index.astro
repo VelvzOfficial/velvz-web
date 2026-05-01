@@ -1,0 +1,34 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/HeroSplit.astro';
+import SectionBanco from '../components/SectionBanco.astro';
+import SectionMovimientos from '../components/SectionMovimientos.astro';
+import SectionCopiloto from '../components/SectionCopiloto.astro';
+import SectionPanel from '../components/SectionPanel.astro';
+import SectionSuscripciones from '../components/SectionSuscripciones.astro';
+import SectionPrivacidad from '../components/SectionPrivacidad.astro';
+import Waitlist from '../components/Waitlist.astro';
+import SectionDivider from '../components/SectionDivider.astro';
+---
+
+<Layout>
+  <Header />
+  <main>
+    <Hero />
+    <SectionDivider />
+    <SectionBanco />
+    <SectionDivider />
+    <SectionMovimientos />
+    <SectionDivider />
+    <SectionCopiloto />
+    <SectionDivider />
+    <SectionPanel />
+    <SectionDivider />
+    <SectionSuscripciones />
+    <SectionDivider />
+    <SectionPrivacidad />
+    <SectionDivider />
+    <Waitlist />
+  </main>
+</Layout>

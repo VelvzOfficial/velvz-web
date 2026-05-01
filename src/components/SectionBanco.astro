@@ -1,0 +1,272 @@
+---
+/**
+ * Sección 2 — Conexión bancaria
+ *
+ * Layout vertical limpio:
+ *   ↑  Título arriba         ("Conecta tu banco. Una vez.")
+ *   ·  3 filas de cards en el medio (deslizándose en direcciones alternas)
+ *   ↓  Subtítulo abajo       ("Velvz se encarga del resto.")
+ *
+ * Cards uniformes: gradiente con el color de marca + nombre del banco en
+ * tipografía. Sin logos. Sin vignette central — solo fade en bordes para
+ * transición con secciones vecinas.
+ */
+
+type Bank = {
+  name: string;
+  short?: string;
+  from: string;
+  to: string;
+};
+
+const banks: Bank[] = [
+  // España
+  { name: 'Bankinter',       from: '#FF7849', to: '#C24A1B' },
+  { name: 'BBVA',            from: '#1464A5', to: '#072146' },
+  { name: 'Santander',       from: '#EC0000', to: '#8C0000' },
+  { name: 'CaixaBank',       from: '#007AC7', to: '#003B5C' },
+  { name: 'Sabadell',        from: '#0066B3', to: '#003666' },
+  { name: 'Openbank',        from: '#FF1430', to: '#A1001D' },
+  { name: 'Kutxabank',       from: '#E63312', to: '#7A1808' },
+  { name: 'Unicaja',         from: '#3FA34D', to: '#1F5F2A' },
+  { name: 'imagin',          from: '#00C6D7', to: '#007987' },
+  { name: 'Cajamar',         from: '#7AB539', to: '#3C661A' },
+  { name: 'Abanca',          from: '#5C2D91', to: '#2B114A' },
+  { name: 'EVO',             from: '#FFC600', to: '#9A7A00' },
+  // Neobancos
+  { name: 'Revolut',         from: '#0666EB', to: '#0A2E73' },
+  { name: 'N26',             from: '#26D8A6', to: '#0A6B53' },
+  { name: 'Wise',            from: '#9FE870', to: '#3F7D1B' },
+  { name: 'Monzo',           from: '#FF4F40', to: '#8E1F15' },
+  { name: 'Starling',        from: '#7433FF', to: '#3A0E8A' },
+  { name: 'bunq',            from: '#34C759', to: '#13702A' },
+  // Resto Europa
+  { name: 'ING',             from: '#FF6200', to: '#A33D00' },
+  { name: 'Deutsche Bank',   short: 'Deutsche', from: '#0E5BAA', to: '#062E59' },
+  { name: 'BNP Paribas',     short: 'BNP',      from: '#009450', to: '#03512C' },
+  { name: 'Crédit Agricole', short: 'C. Agricole', from: '#039E45', to: '#005525' },
+  { name: 'HSBC',            from: '#DB0011', to: '#7A000A' },
+  { name: 'Barclays',        from: '#00AEEF', to: '#003E66' },
+  { name: 'Société Générale', short: 'Société', from: '#E60028', to: '#7A0015' },
+  { name: 'ABN AMRO',        from: '#FFD500', to: '#8A7300' },
+  { name: 'Rabobank',        from: '#FF6B00', to: '#A0420A' },
+  { name: 'Boursorama', short: 'Bours.', from: '#E20074', to: '#74003A' },
+];
+
+// 3 filas alternando para que ninguna quede toda con colores parecidos
+const rows = [
+  banks.filter((_, i) => i % 3 === 0),
+  banks.filter((_, i) => i % 3 === 1),
+  banks.filter((_, i) => i % 3 === 2),
+];
+---
+
+<section class="banco" id="banco">
+  <!-- Título + subtítulo (subtítulo aparece 1s después con fade-in) -->
+  <div class="container container--tight banco__top">
+    <h2 class="section-title reveal">
+      Conecta tu banco. <em>Una vez.</em>
+    </h2>
+    <p class="banco__sub reveal" style="--reveal-delay: 1s">
+      <em>Velvz</em> se encarga del resto.
+    </p>
+  </div>
+
+  <!-- 3 filas de cards en el medio -->
+  <div class="banco__rows" aria-hidden="true">
+    {rows.map((row, idx) => (
+      <div class={`banco__row banco__row--${idx + 1}`}>
+        <div class="banco__track">
+          {[...row, ...row, ...row].map((b) => (
+            <div
+              class="bcard"
+              style={`--bcard-from: ${b.from}; --bcard-to: ${b.to};`}
+            >
+              <span class="bcard__chip" aria-hidden="true"></span>
+              <span class="bcard__name">{b.short || b.name}</span>
+              <span class="bcard__strip" aria-hidden="true"></span>
+            </div>
+          ))}
+        </div>
+      </div>
+    ))}
+    <!-- Fade lateral para que las cards no se "corten" en seco -->
+    <div class="banco__edges"></div>
+  </div>
+</section>
+
+<style>
+  .banco {
+    position: relative;
+    isolation: isolate;
+    min-height: 100vh;
+    padding: var(--section-py) 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: clamp(40px, 6vw, 80px);
+  }
+
+  /* ── Top: título ──────────────────────────────────────────── */
+  .banco__top {
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .banco__top .section-title {
+    margin: 0;
+  }
+  .banco__top .section-title em {
+    font-style: normal;
+    /* mismos azules glow IA del hero */
+    background: linear-gradient(120deg, #4D99E6 0%, #1A66FF 50%, #003399 100%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: bancoGradSlide 8s ease-in-out infinite;
+  }
+  @keyframes bancoGradSlide {
+    0%, 100% { background-position: 0% 50%; }
+    50%      { background-position: 100% 50%; }
+  }
+
+  /* ── Middle: 3 filas de cards ─────────────────────────────── */
+  .banco__rows {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 28px;
+    min-height: 0; /* permite que flex-1 colapse correctamente */
+  }
+  .banco__row {
+    width: 100%;
+    overflow: hidden;
+    opacity: 1;
+  }
+  .banco__track {
+    display: flex;
+    gap: 28px;
+    width: max-content;
+    will-change: transform;
+  }
+
+  /* Velocidades lentas, ligeramente distintas para evitar patrón visible */
+  .banco__row--1 .banco__track { animation: bancoSlide 165s linear infinite; }
+  .banco__row--2 .banco__track { animation: bancoSlideR 195s linear infinite; }
+  .banco__row--3 .banco__track { animation: bancoSlide 180s linear infinite; }
+
+  @keyframes bancoSlide {
+    0%   { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-33.3333%, 0, 0); }
+  }
+  @keyframes bancoSlideR {
+    0%   { transform: translate3d(-33.3333%, 0, 0); }
+    100% { transform: translate3d(0, 0, 0); }
+  }
+
+  /* Solo fade en bordes laterales — sin oscurecer el centro */
+  .banco__edges {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(
+        to right,
+        var(--bg) 0%,
+        transparent 7%,
+        transparent 93%,
+        var(--bg) 100%
+      );
+  }
+
+  /* ── Card de banco ────────────────────────────────────────── */
+  .bcard {
+    flex: 0 0 auto;
+    width: 240px;
+    height: 148px;
+    border-radius: 18px;
+    padding: 16px 18px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(140deg, var(--bcard-from) 0%, var(--bcard-to) 100%);
+    color: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow:
+      0 18px 48px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  }
+  .bcard::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 25% 0%, rgba(255, 255, 255, 0.22) 0%, transparent 55%);
+    pointer-events: none;
+  }
+
+  .bcard__chip {
+    width: 26px;
+    height: 20px;
+    border-radius: 4px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.18));
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+    flex-shrink: 0;
+  }
+  .bcard__name {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1;
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.18);
+    align-self: flex-start;
+  }
+  .bcard__strip {
+    align-self: flex-end;
+    width: 36px;
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.4);
+  }
+
+  /* ── Subtítulo (debajo del título, aparece con delay) ─────── */
+  .banco__sub {
+    margin: 18px 0 0;
+    font-size: clamp(17px, 1.4vw, 21px);
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: -0.005em;
+  }
+  .banco__sub em {
+    font-style: normal;
+    font-weight: 700;
+    background: linear-gradient(120deg, #4D99E6 0%, #1A66FF 50%, #003399 100%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: bancoGradSlide 8s ease-in-out infinite;
+  }
+
+  /* ── Reduced motion ───────────────────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    .banco__row .banco__track { animation: none; }
+    .banco__top .section-title em,
+    .banco__sub em { animation: none; }
+  }
+
+  /* ── Responsive ───────────────────────────────────────────── */
+  @media (max-width: 980px) {
+    .bcard { width: 200px; height: 124px; padding: 14px 16px; border-radius: 16px; }
+    .bcard__name { font-size: 18px; }
+    .banco__rows { gap: 20px; }
+  }
+  @media (max-width: 640px) {
+    .bcard { width: 168px; height: 104px; padding: 12px 14px; }
+    .bcard__name { font-size: 16px; }
+    .banco__row--3 { display: none; } /* 2 filas en móvil */
+  }
+</style>

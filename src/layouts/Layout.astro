@@ -1,0 +1,84 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'Velvz — Tu copiloto financiero, hecho para Apple',
+  description = 'Velvz conecta tu banco, organiza tu dinero con IA y te habla como un contable de confianza. Diseñada de cero para iPhone, iPad y Mac.',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#050507" />
+    <meta name="color-scheme" content="dark" />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+
+    <link rel="icon" type="image/png" href="/velvz-icon.png" />
+    <link rel="apple-touch-icon" href="/velvz-icon.png" />
+
+    <!-- Preload de assets del hero — decodificados antes del primer paint
+         para evitar halos por compositing parcial sobre imágenes en decode -->
+    <link rel="preload" as="image" href="/mockups/panel-mac.png" fetchpriority="high" />
+    <link rel="preload" as="image" href="/mockups/suscripciones-iphone.png" fetchpriority="high" />
+    <link rel="preload" as="image" href="/hero-bg.png" fetchpriority="high" />
+
+    <!-- OpenGraph / social -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content="https://velvz.com" />
+    <meta property="og:locale" content="es_ES" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+  </head>
+  <body>
+    <slot />
+
+    <script is:inline>
+      // Reveal on scroll — single global IntersectionObserver
+      (() => {
+        if (window.__velvzRevealStarted) return;
+        window.__velvzRevealStarted = true;
+
+        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const items = document.querySelectorAll('.reveal');
+        if (reduce) {
+          items.forEach((el) => el.classList.add('is-visible'));
+          return;
+        }
+        const io = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add('is-visible');
+                io.unobserve(e.target);
+              }
+            });
+          },
+          { threshold: 0.01, rootMargin: '0px 0px 12% 0px' }
+        );
+        items.forEach((el) => io.observe(el));
+
+        // Failsafe: tras 3s, cualquier .reveal aún sin disparar se hace visible.
+        // Cubre el caso de elementos siempre fuera de viewport o IO no soportado.
+        window.setTimeout(() => {
+          document.querySelectorAll('.reveal:not(.is-visible)').forEach((el) => {
+            el.classList.add('is-visible');
+          });
+        }, 3000);
+      })();
+    </script>
+  </body>
+</html>

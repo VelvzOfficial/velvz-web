@@ -1,0 +1,161 @@
+---
+/**
+ * VelvzFace — réplica 1:1 de VelvzLogoView.swift
+ *
+ * Proporciones (tomadas del código real de la app):
+ *   eye      = 18% del tamaño base
+ *   mouth    = 32% × 14% del tamaño base
+ *   spacing  = 12% del tamaño base
+ *   color    = gris sistema en dark mode (#8E8E93)
+ *
+ * Animación de parpadeo:
+ *   - los ojos pasan de scaleY(1) → scaleY(0.1) → scaleY(1)
+ *   - cada lado de la animación dura 80ms (igual que en SwiftUI)
+ *   - intervalo aleatorio entre parpadeos: 2,5–5 s
+ *   - 25% de probabilidad de doble parpadeo (gap 300ms)
+ *
+ * Todas las instancias parpadean sincronizadas a través de un
+ * BroadcastChannel ligero (equivalente a VelvzBlinkState.shared).
+ *
+ * Props:
+ *   size?  : tamaño base en px (por defecto 56, igual que SwiftUI).
+ *   color? : color CSS para los ojos y boca (por defecto var(--face)).
+ *   glow?  : si true, añade un halo azul detrás (variante hero/cta).
+ *   class? : clase adicional para el contenedor.
+ */
+interface Props {
+  size?: number;
+  color?: string;
+  glow?: boolean;
+  class?: string;
+}
+const {
+  size = 56,
+  color = 'var(--face)',
+  glow = false,
+  class: className = '',
+} = Astro.props;
+---
+
+<span
+  class={`velvz-face ${glow ? 'is-glow' : ''} ${className}`}
+  style={`--face-size:${size}px; --face-color:${color};`}
+  aria-hidden="true"
+>
+  <span class="velvz-face__eye velvz-face__eye--left"></span>
+  <span class="velvz-face__mouth"></span>
+  <span class="velvz-face__eye velvz-face__eye--right"></span>
+</span>
+
+<style>
+  .velvz-face {
+    --eye: calc(var(--face-size) * 0.18);
+    --mouth-w: calc(var(--face-size) * 0.32);
+    --mouth-h: calc(var(--face-size) * 0.14);
+    --gap: calc(var(--face-size) * 0.12);
+    /* Altura del bounding box (igual al `surprisedSize` del SwiftUI) */
+    --box-h: calc(var(--face-size) * 0.20);
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--gap);
+    height: var(--box-h);
+    line-height: 0;
+    vertical-align: middle;
+  }
+
+  .velvz-face__eye {
+    width: var(--eye);
+    height: var(--eye);
+    background: var(--face-color);
+    border-radius: 50%;
+    transform-origin: center;
+    will-change: transform;
+    animation: velvzBlink 0.16s ease-in-out var(--blink-delay, 0s) paused;
+  }
+
+  .velvz-face__mouth {
+    width: var(--mouth-w);
+    height: var(--mouth-h);
+    background: var(--face-color);
+    border-radius: 999px; /* cornerRadius = mouthH/2 → cápsula completa */
+  }
+
+  /* Variante con halo (para el botón flotante del hero) */
+  .velvz-face.is-glow {
+    --face-color: #FFFFFF;
+    padding: calc(var(--face-size) * 0.45) calc(var(--face-size) * 0.35);
+    height: auto;
+    background: radial-gradient(
+      circle at 50% 50%,
+      var(--accent) 0%,
+      rgba(10, 132, 255, 0.55) 55%,
+      rgba(10, 132, 255, 0) 100%
+    );
+    border-radius: 50%;
+    box-shadow:
+      0 0 60px rgba(10, 132, 255, 0.55),
+      0 0 120px rgba(10, 132, 255, 0.35);
+  }
+
+  /* La animación se dispara añadiendo la clase .is-blinking desde JS.
+     scaleY(1) → scaleY(0.1) → scaleY(1) en 160ms, igual que SwiftUI. */
+  .velvz-face.is-blinking .velvz-face__eye {
+    animation: velvzBlink 0.16s ease-in-out 1 forwards;
+  }
+
+  @keyframes velvzBlink {
+    0%   { transform: scaleY(1); }
+    50%  { transform: scaleY(0.1); }
+    100% { transform: scaleY(1); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .velvz-face.is-blinking .velvz-face__eye {
+      animation: none;
+    }
+  }
+</style>
+
+<script is:inline>
+  // Loop de parpadeo global, equivalente a VelvzBlinkState.shared.
+  // Solo arrancamos una vez por documento.
+  (() => {
+    if (window.__velvzBlinkStarted) return;
+    window.__velvzBlinkStarted = true;
+
+    const triggerBlink = () => {
+      const faces = document.querySelectorAll('.velvz-face');
+      faces.forEach((face) => {
+        face.classList.remove('is-blinking');
+        // forzamos reflow para que la animación reinicie
+        void face.offsetWidth;
+        face.classList.add('is-blinking');
+      });
+      // limpiamos la clase tras la animación para poder reactivarla
+      window.setTimeout(() => {
+        faces.forEach((face) => face.classList.remove('is-blinking'));
+      }, 200);
+    };
+
+    const scheduleNext = () => {
+      const interval = 2500 + Math.random() * 2500; // 2,5–5 s
+      window.setTimeout(() => {
+        triggerBlink();
+        // 25% de doble parpadeo (Math.random < 0.25)
+        if (Math.random() < 0.25) {
+          window.setTimeout(triggerBlink, 300);
+        }
+        scheduleNext();
+      }, interval);
+    };
+
+    // Esperamos al primer paint para arrancar.
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', scheduleNext, { once: true });
+    } else {
+      scheduleNext();
+    }
+  })();
+</script>

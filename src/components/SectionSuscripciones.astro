@@ -1,0 +1,308 @@
+---
+/**
+ * Sección 6 — Suscripciones
+ *
+ * Layout 2 columnas (desktop): copy a la izquierda, carrusel VERTICAL
+ * de tarjetas de suscripción a la derecha. Auto-scroll lento hacia
+ * arriba con loop seamless (la lista se duplica para que no haya
+ * salto en el seam). Hover pausa la animación.
+ *
+ * En móvil: stack vertical, copy arriba y carrusel debajo (con altura
+ * algo menor para no comerse pantalla).
+ *
+ * Cada tarjeta usa la misma paleta de marca que en la app real
+ * (gradiente lineal con el color de la suscripción) y muestra: icono,
+ * nombre, importe, plan y próximo cargo.
+ */
+
+const SUBS = [
+  { name: 'Basic-Fit',  amount: '35,00 €', plan: 'Mensual',  next: '8 may',  color: 'red',      icon: 'run' },
+  { name: 'BBVA',       amount: '3,00 €',  plan: 'Comisión', next: '1 may',  color: 'beige',    icon: 'briefcase' },
+  { name: 'Netflix',    amount: '12,99 €', plan: 'Mensual',  next: '2 may',  color: 'magenta',  icon: 'tv' },
+  { name: 'iCloud+',    amount: '2,99 €',  plan: 'Mensual',  next: '16 may', color: 'cyan',     icon: 'cloud' },
+  { name: 'Spotify',    amount: '11,99 €', plan: 'Mensual',  next: '9 may',  color: 'pink',     icon: 'music' },
+  { name: 'Movistar',   amount: '49,90 €', plan: 'Mensual',  next: '12 may', color: 'green',    icon: 'phone' },
+  { name: 'ChatGPT',    amount: '22,00 €', plan: 'Mensual',  next: '14 may', color: 'graphite', icon: 'spark' },
+  { name: 'Cursor',     amount: '20,00 €', plan: 'Mensual',  next: '5 may',  color: 'orange',   icon: 'spark' },
+];
+---
+
+<section class="subs" id="suscripciones">
+  <div class="container container--tight subs__layout">
+    <!-- Copy izquierda -->
+    <div class="subs__copy">
+      <h2 class="section-title reveal">
+        Detectamos tus <em>suscripciones</em>.
+      </h2>
+      <p class="section-lead reveal" style="--reveal-delay: .15s">
+        Velvz detecta los pagos que se repiten cada mes, los agrupa
+        por producto y te avisa cuando algo sube de precio o se
+        duplica.
+      </p>
+    </div>
+
+    <!-- Carrusel vertical derecha -->
+    <div class="subs__column reveal" style="--reveal-delay: .3s" data-track>
+      <div class="subs__track" data-track-inner>
+        {[...SUBS, ...SUBS].map((s) => (
+          <article class={`sub sub--${s.color}`}>
+            <div class="sub__icon">
+              {s.icon === 'run' && (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 4a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM6 21l3-7 3 2 2-3 4 6"/></svg>
+              )}
+              {s.icon === 'briefcase' && (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 5h6v3h5v12H4V8h5z"/></svg>
+              )}
+              {s.icon === 'tv' && (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5h18v12H3zM8 21h8v-2H8z"/></svg>
+              )}
+              {s.icon === 'cloud' && (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 18a4 4 0 1 1 .5-7.97A6 6 0 0 1 19 12a3.5 3.5 0 0 1-2 6.5z"/></svg>
+              )}
+              {s.icon === 'music' && (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 18a3 3 0 1 1-2-2.83V5l11-2v12.17A3 3 0 1 1 16 12V6L9 7.5z"/></svg>
+              )}
+              {s.icon === 'phone' && (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 4h4l2 5-2 1a12 12 0 0 0 5 5l1-2 5 2v4a2 2 0 0 1-2 2A17 17 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>
+              )}
+              {s.icon === 'spark' && (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/></svg>
+              )}
+            </div>
+            <div class="sub__body">
+              <p class="sub__name">{s.name}</p>
+              <p class="sub__plan">{s.plan}</p>
+            </div>
+            <div class="sub__right">
+              <p class="sub__amount">{s.amount}</p>
+              <span class="sub__next">
+                <span class="sub__dot"></span>
+                Próximo: {s.next}
+              </span>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .subs {
+    position: relative;
+    padding: var(--section-py) 0;
+    overflow: hidden;
+  }
+
+  /* Layout: 2 columnas en desktop. La columna del carrusel tiene un
+     ancho fijo (caben las cards sin reflow); la del copy ocupa el
+     resto y queda vertical-centrada. */
+  .subs__layout {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .subs__copy {
+    max-width: 520px;
+  }
+  .subs__copy .section-title {
+    margin-top: 14px;
+  }
+  .subs__copy .section-lead {
+    margin-top: 18px;
+    max-width: 480px;
+  }
+
+  /* Columna del carrusel: viewport con altura fija + máscara de fade
+     arriba y abajo para que las cards entren/salgan suavemente. */
+  .subs__column {
+    position: relative;
+    height: 600px;
+    overflow: hidden;
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      #000 10%,
+      #000 90%,
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      #000 10%,
+      #000 90%,
+      transparent 100%
+    );
+  }
+
+  /* Track interior: 2 copias de las cards apiladas verticalmente y
+     animadas hacia arriba. Truco para loop seamless:
+       - NO usamos `gap` ni `padding` en el track (cualquier separador
+         que NO sea parte de la altura de las cards rompe el cálculo
+         del -50%, porque translateY(%) se calcula sobre la altura del
+         elemento — incluyendo padding pero NO los gaps de flex).
+       - La separación entre cards va como `margin-bottom` en cada
+         `.sub`. Así la altura total del track es exactamente
+         16 cards × (height + margin), y -50% cae justo en el inicio
+         de la card 9 (= duplicado de la 1). El loop al volver a 0%
+         es visualmente idéntico — sin salto. */
+  .subs__track {
+    display: flex;
+    flex-direction: column;
+    animation: subsScrollV 38s linear infinite;
+    will-change: transform;
+  }
+  @keyframes subsScrollV {
+    0%   { transform: translateY(0); }
+    100% { transform: translateY(-50%); }
+  }
+
+  /* Card horizontal: icono | nombre+plan | importe+próximo */
+  .sub {
+    flex: 0 0 auto;
+    width: 100%;
+    height: 132px;
+    margin-bottom: 16px; /* separación entre cards (NO gap — ver track) */
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 14px;
+    align-items: center;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+      0 24px 60px rgba(0, 0, 0, 0.42),
+      inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  }
+  .sub::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle at 30% 0%,
+      rgba(255, 255, 255, 0.22) 0%,
+      transparent 60%
+    );
+    pointer-events: none;
+  }
+
+  .sub--red       { background: linear-gradient(160deg, #FF5A52 0%, #C8312A 100%); }
+  .sub--beige     { background: linear-gradient(160deg, #C7B79A 0%, #6E624C 100%); }
+  .sub--orange    { background: linear-gradient(160deg, #FF9F0A 0%, #C66E00 100%); }
+  .sub--cyan      { background: linear-gradient(160deg, #5AC8FA 0%, #0A84FF 100%); }
+  .sub--magenta   { background: linear-gradient(160deg, #DB58E0 0%, #6E2A8E 100%); }
+  .sub--pink      { background: linear-gradient(160deg, #FF6FAA 0%, #C72D6B 100%); }
+  .sub--green     { background: linear-gradient(160deg, #34D158 0%, #156D2D 100%); }
+  .sub--graphite  { background: linear-gradient(160deg, #4A4A52 0%, #1F1F24 100%); }
+
+  /* Icono cuadrado glass */
+  .sub__icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius);
+    background: rgba(255, 255, 255, 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    position: relative;
+    z-index: 1;
+  }
+  .sub__icon svg { width: 24px; height: 24px; }
+
+  /* Centro: nombre + plan */
+  .sub__body {
+    position: relative;
+    z-index: 1;
+    min-width: 0; /* permite truncar */
+  }
+  .sub__name {
+    margin: 0;
+    font-size: 14.5px;
+    font-weight: 700;
+    letter-spacing: -0.005em;
+    line-height: 1.2;
+  }
+  .sub__plan {
+    margin: 4px 0 0;
+    font-size: 12px;
+    opacity: 0.78;
+    letter-spacing: 0.02em;
+  }
+
+  /* Derecha: importe arriba + próximo abajo */
+  .sub__right {
+    text-align: right;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+  }
+  .sub__amount {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .sub__next {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    opacity: 0.85;
+    padding: 5px 9px;
+    border-radius: var(--radius-pill);
+    background: rgba(0, 0, 0, 0.22);
+    white-space: nowrap;
+  }
+  .sub__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #fff;
+    opacity: 0.9;
+  }
+
+  /* Tablet/móvil: stack vertical, copy arriba, carrusel debajo */
+  @media (max-width: 880px) {
+    .subs__layout {
+      grid-template-columns: 1fr;
+      gap: 48px;
+    }
+    .subs__copy {
+      text-align: center;
+      margin: 0 auto;
+    }
+    .subs__copy .section-lead { margin-left: auto; margin-right: auto; }
+    .subs__column {
+      height: 480px;
+      max-width: 380px;
+      margin: 0 auto;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .sub {
+      height: 116px;
+      padding: 14px 16px;
+      gap: 12px;
+    }
+    .sub__icon { width: 42px; height: 42px; }
+    .sub__icon svg { width: 22px; height: 22px; }
+    .sub__name { font-size: 13.5px; }
+    .sub__amount { font-size: 19px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .subs__track { animation: none; }
+  }
+</style>

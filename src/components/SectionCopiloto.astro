@@ -1,0 +1,430 @@
+---
+/**
+ * Sección 4 — El copiloto
+ *
+ * Composición central (cara + título + subtítulo) rodeada de:
+ *   - Capa 1: insight cards legibles (12) — los hallazgos del copiloto
+ *   - Capa 2: cards atmosféricas (~20) — small + heavy blur, son ruido
+ *     visual que crea la sensación de "muchos hallazgos en marcha"
+ */
+import VelvzFace from './VelvzFace.astro';
+
+type Card = {
+  label: string;
+  value: string;
+  sub?: string;
+  size: 'sm' | 'md' | 'lg';
+  x: string;
+  y: string;
+  r: string;
+  blur: number;
+  dur: string;
+  delay: string;
+};
+
+// Insights legibles — 12 cards en primer plano. Cada una es una ALERTA
+// concreta que el copiloto ha cazado: subidas de precio, cargos
+// duplicados, suscripciones olvidadas, comisiones nuevas, anomalías.
+// Sin resúmenes genéricos tipo "gasto medio" — esto va de cosas que
+// IMPORTAN y que tú no habrías visto solo.
+const cards: Card[] = [
+  { label: 'Netflix subió',      value: '+ 1,00 €/mes',  sub: 'desde abril, sin avisarte',
+    size: 'lg', x: '18%', y: '14%', r: '-3deg', blur: 0, dur: '6s',   delay: '0s'   },
+  { label: 'Suscripción nueva',  value: 'TikTok Premium', sub: '9,99 €/mes · tu Apple ID',
+    size: 'md', x: '80%', y: '18%', r: '3deg',  blur: 0, dur: '5.5s', delay: '0.4s' },
+  { label: 'Comisión nueva',     value: '+ 3,50 €',      sub: 'BBVA · antes 2,00 €',
+    size: 'sm', x: '92%', y: '5%',  r: '-5deg', blur: 3, dur: '7s',   delay: '1.6s' },
+  { label: 'Cargo duplicado',    value: 'Mercadona × 2', sub: '18,40 € el mismo día',
+    size: 'sm', x: '52%', y: '4%',  r: '4deg',  blur: 2, dur: '7.5s', delay: '0.8s' },
+  { label: 'Sin abrir',          value: '60 días',       sub: 'Adobe Creative · 20,99 €',
+    size: 'sm', x: '4%',  y: '32%', r: '-4deg', blur: 4, dur: '7.5s', delay: '0.5s' },
+  { label: 'Iberdrola',          value: '+ 8,20 €/mes',  sub: 'subida de tarifa',
+    size: 'sm', x: '94%', y: '40%', r: '-3deg', blur: 1, dur: '6.2s', delay: '1.8s' },
+  { label: 'Anomalía',           value: '+ 340 €',       sub: 'Amazon · gasto inusual',
+    size: 'sm', x: '8%',  y: '52%', r: '3deg',  blur: 3, dur: '7.2s', delay: '2.4s' },
+  { label: 'Devolución',         value: '− 45,00 €',     sub: 'Amazon · pendiente 14 días',
+    size: 'sm', x: '90%', y: '58%', r: '4deg',  blur: 2, dur: '5.8s', delay: '0.2s' },
+  { label: 'Récord 6 meses',     value: '286 €',         sub: 'restaurantes este mes',
+    size: 'sm', x: '14%', y: '78%', r: '2deg',  blur: 1, dur: '6.8s', delay: '1.2s' },
+  { label: 'Pago duplicado',     value: 'Spotify × 2',   sub: '12,99 € · 9 may',
+    size: 'md', x: '84%', y: '78%', r: '-2deg', blur: 0, dur: '6.5s', delay: '0.8s' },
+  { label: 'Sin uso',            value: 'MyHeritage',    sub: '9,99 €/mes · 6 meses',
+    size: 'sm', x: '32%', y: '92%', r: '3deg',  blur: 1, dur: '6s',   delay: '2s'   },
+  { label: 'Vodafone subió',     value: '+ 5,00 €/mes',  sub: 'subida silenciosa',
+    size: 'md', x: '66%', y: '92%', r: '-3deg', blur: 2, dur: '5.2s', delay: '1.5s' },
+];
+
+// Cards atmosféricas — content variado tipo "insight IA" + variación de
+// profundidad (algunas casi nítidas, otras muy borrosas) y opacidad por
+// card. Evitan la zona central (x:32-68%, y:35-65%) donde va la cara/texto.
+type BgCard = {
+  text: string;
+  x: string;
+  y: string;
+  r: string;
+  blur: number;     // px directo
+  width: number;
+  opacity: number;  // por card → variación de profundidad
+  dur: string;
+  delay: string;
+};
+
+const bgCards: BgCard[] = [
+  // ── Fila superior (y < 18%) ────────────────────────────────
+  { text: '8 €',           x: '3%',  y: '6%',  r: '-7deg', blur: 5,   width: 80,  opacity: 0.5,  dur: '8s',   delay: '0s'   },
+  { text: 'Salidas',       x: '14%', y: '10%', r: '4deg',  blur: 6,   width: 84,  opacity: 0.45, dur: '8s',   delay: '0.7s' },
+  { text: 'Tarjeta vence', x: '34%', y: '16%', r: '-3deg', blur: 1.5, width: 124, opacity: 0.85, dur: '6.3s', delay: '1.5s' },
+  { text: 'Anomalía',      x: '60%', y: '6%',  r: '5deg',  blur: 3,   width: 92,  opacity: 0.75, dur: '7.3s', delay: '1.7s' },
+  { text: 'Lidl',          x: '74%', y: '4%',  r: '-3deg', blur: 3,   width: 78,  opacity: 0.7,  dur: '9s',   delay: '1s'   },
+  { text: '+ 1.480 €',     x: '88%', y: '14%', r: '-4deg', blur: 4,   width: 100, opacity: 0.6,  dur: '7.6s', delay: '0.3s' },
+  { text: 'Mensual',       x: '92%', y: '4%',  r: '6deg',  blur: 6,   width: 80,  opacity: 0.4,  dur: '6.4s', delay: '2s'   },
+
+  // ── Mid-left (x < 30%, 18% < y < 50%) ─────────────────────
+  { text: '2 deudas',      x: '12%', y: '20%', r: '6deg',  blur: 5,   width: 96,  opacity: 0.5,  dur: '8.8s', delay: '2.5s' },
+  { text: 'Pago doble',    x: '26%', y: '30%', r: '-3deg', blur: 1.5, width: 116, opacity: 0.85, dur: '6.5s', delay: '0.3s' },
+  { text: '21 cargos',     x: '6%',  y: '34%', r: '6deg',  blur: 7,   width: 88,  opacity: 0.35, dur: '8s',   delay: '1.8s' },
+  { text: '12 visitas',    x: '8%',  y: '46%', r: '3deg',  blur: 5,   width: 102, opacity: 0.45, dur: '6.8s', delay: '2.1s' },
+  { text: 'Octubre',       x: '20%', y: '46%', r: '4deg',  blur: 5,   width: 88,  opacity: 0.55, dur: '8.7s', delay: '1.8s' },
+
+  // ── Mid-right (x > 70%, 18% < y < 50%) ────────────────────
+  { text: 'Apple',         x: '78%', y: '20%', r: '4deg',  blur: 4,   width: 80,  opacity: 0.65, dur: '6.4s', delay: '0.9s' },
+  { text: 'Récord mes',    x: '70%', y: '24%', r: '-3deg', blur: 2,   width: 112, opacity: 0.85, dur: '7.5s', delay: '0.5s' },
+  { text: '+ 56 €',        x: '90%', y: '30%', r: '-3deg', blur: 1.5, width: 86,  opacity: 0.85, dur: '6.7s', delay: '1.4s' },
+  { text: 'Suscr. ↑',      x: '82%', y: '40%', r: '5deg',  blur: 5,   width: 96,  opacity: 0.55, dur: '8.3s', delay: '1.9s' },
+  { text: 'Iberdrola',     x: '94%', y: '44%', r: '6deg',  blur: 7,   width: 100, opacity: 0.4,  dur: '9.5s', delay: '0.9s' },
+  { text: 'Amazon',        x: '94%', y: '24%', r: '-2deg', blur: 6,   width: 92,  opacity: 0.45, dur: '6.5s', delay: '0.5s' },
+
+  // ── Lateral izquierdo medio (35% < y < 65%, x < 26%) ──────
+  { text: 'Lunes',         x: '4%',  y: '52%', r: '-5deg', blur: 7,   width: 76,  opacity: 0.4,  dur: '8s',   delay: '1.7s' },
+  { text: 'Cargo X',       x: '4%',  y: '64%', r: '6deg',  blur: 8,   width: 78,  opacity: 0.35, dur: '7.4s', delay: '0.6s' },
+  { text: 'Refresco',      x: '20%', y: '60%', r: '6deg',  blur: 5,   width: 92,  opacity: 0.55, dur: '7.7s', delay: '2.1s' },
+
+  // ── Lateral derecho medio (35% < y < 65%, x > 74%) ────────
+  { text: 'Ocio',          x: '88%', y: '54%', r: '4deg',  blur: 5,   width: 74,  opacity: 0.55, dur: '8s',   delay: '1.1s' },
+  { text: '+ ahorras',     x: '96%', y: '60%', r: '-3deg', blur: 4,   width: 96,  opacity: 0.6,  dur: '6.9s', delay: '0.4s' },
+  { text: '− 0,99 €',      x: '78%', y: '62%', r: '-5deg', blur: 7,   width: 96,  opacity: 0.4,  dur: '7.2s', delay: '0.4s' },
+
+  // ── Bottom row (y > 70%) ───────────────────────────────────
+  { text: 'Hipoteca',      x: '8%',  y: '74%', r: '5deg',  blur: 3,   width: 96,  opacity: 0.7,  dur: '7.8s', delay: '0.5s' },
+  { text: 'Mes cerrado',   x: '24%', y: '76%', r: '-3deg', blur: 2,   width: 130, opacity: 0.85, dur: '6s',   delay: '1.2s' },
+  { text: 'Cuota',         x: '14%', y: '88%', r: '-4deg', blur: 6,   width: 74,  opacity: 0.45, dur: '7s',   delay: '0.4s' },
+  { text: '+ 1.2 k',       x: '4%',  y: '90%', r: '-7deg', blur: 5,   width: 86,  opacity: 0.55, dur: '7.4s', delay: '0s'   },
+  { text: 'Hoy',           x: '36%', y: '76%', r: '6deg',  blur: 6,   width: 64,  opacity: 0.5,  dur: '8s',   delay: '0.7s' },
+  { text: 'Devolución',    x: '32%', y: '88%', r: '5deg',  blur: 3,   width: 110, opacity: 0.75, dur: '7.5s', delay: '1.1s' },
+  { text: 'Patrón nuevo',  x: '54%', y: '78%', r: '-3deg', blur: 1.5, width: 124, opacity: 0.9,  dur: '7s',   delay: '1.6s' },
+  { text: 'Q2',            x: '46%', y: '92%', r: '-4deg', blur: 5,   width: 60,  opacity: 0.5,  dur: '7.5s', delay: '2.4s' },
+  { text: 'Comisión',      x: '70%', y: '88%', r: '5deg',  blur: 5,   width: 92,  opacity: 0.55, dur: '6.7s', delay: '1.5s' },
+  { text: 'Trabajo',       x: '80%', y: '76%', r: '-5deg', blur: 7,   width: 84,  opacity: 0.4,  dur: '8.6s', delay: '1.8s' },
+  { text: '↓ Spotify',     x: '94%', y: '88%', r: '-5deg', blur: 4,   width: 100, opacity: 0.65, dur: '7.9s', delay: '2.2s' },
+  { text: 'Bizum × 4',     x: '88%', y: '76%', r: '6deg',  blur: 4,   width: 96,  opacity: 0.6,  dur: '8.6s', delay: '0.8s' },
+];
+---
+
+<section class="cop" id="copiloto" data-cop>
+  <!-- Composición central va fuera del cloud para que se quede estática -->
+  <div class="cop__cloud">
+    <!-- Capa 2: cards atmosféricas borrosas (van detrás) -->
+    {bgCards.map((c) => {
+      const inline = `top:${c.y};left:${c.x};--rot:${c.r};--blur:${c.blur}px;--dur:${c.dur};--delay:${c.delay};width:${c.width}px;--target-opacity:${c.opacity};`;
+      return (
+        <div class="cop-atom" data-blur={c.blur} style={inline} aria-hidden="true">{c.text}</div>
+      );
+    })}
+
+    <!-- Capa 1: insight cards legibles -->
+    {cards.map((c) => {
+      const inline = `top:${c.y};left:${c.x};--rot:${c.r};--blur:${c.blur}px;--dur:${c.dur};--delay:${c.delay};`;
+      return (
+        <article class={`cop-card cop-card--${c.size}`} data-blur={c.blur} style={inline} aria-hidden="true">
+          <p class="cop-card__label">{c.label}</p>
+          <p class="cop-card__value">{c.value}</p>
+          {c.sub && <p class="cop-card__sub">{c.sub}</p>}
+        </article>
+      );
+    })}
+  </div>
+
+  <!-- Composición central: cara + título + subtítulo (estática, no rota) -->
+  <div class="cop__center">
+    <div class="cop__face" aria-hidden="true">
+      <VelvzFace size={140} color="#FFFFFF" />
+    </div>
+    <h2 class="section-title">
+      Siempre <em>atentos</em>.
+    </h2>
+    <p class="section-lead">
+      Velvz analiza continuamente tus finanzas para detectar patrones
+      interesantes o avisarte de anomalías.
+    </p>
+  </div>
+</section>
+
+<script is:inline>
+  /**
+   * Aparición staggered de los widgets cuando el copiloto entra en viewport.
+   * Orden: por profundidad (menos blur = más adelante = primero).
+   */
+  (() => {
+    const section = document.querySelector('[data-cop]');
+    if (!section) return;
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) return; // CSS los muestra ya visibles
+
+    const center = section.querySelector('.cop__center');
+    const all = section.querySelectorAll('.cop-card, .cop-atom');
+
+    // Ordena de menos blur a más blur — los más nítidos (foreground) primero
+    const sorted = Array.from(all).sort((a, b) => {
+      return parseFloat(a.dataset.blur || '0') - parseFloat(b.dataset.blur || '0');
+    });
+
+    let triggered = false;
+    const reveal = () => {
+      if (triggered) return;
+      triggered = true;
+
+      // Widget central aparece primero
+      if (center) center.classList.add('is-entered');
+
+      // Cards staggered por depth — 70 ms entre cada una (más lento que antes)
+      const stagger = 70;
+      sorted.forEach((el, i) => {
+        setTimeout(() => el.classList.add('is-entered'), (i + 1) * stagger);
+      });
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            io.disconnect();
+            reveal();
+            return;
+          }
+        }
+      },
+      { threshold: 0.2 }
+    );
+    io.observe(section);
+  })();
+
+  /* Aplica la animación de parpadeo INLINE en cada ojo. El estilo inline
+     gana siempre la cascada (más alto que cualquier rule, !important o no),
+     así que la regla del script global de VelvzFace ya no nos pisa.
+     Esperamos un tick para que VelvzFace haya pintado los <span> hijos. */
+  (() => {
+    const apply = () => {
+      const eyes = document.querySelectorAll('.cop__face .velvz-face__eye');
+      eyes.forEach((eye) => {
+        eye.style.animation = 'copFaceBlinkLoop 5s ease-in-out infinite';
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', apply, { once: true });
+    } else {
+      // Defer un frame para asegurar que VelvzFace ya está en el DOM
+      requestAnimationFrame(apply);
+    }
+  })();
+</script>
+
+<style>
+  .cop {
+    position: relative;
+    overflow: hidden;
+    padding: var(--section-py) 0;
+  }
+
+  /* ── Cloud ───────────────────────────────────────────────── */
+  .cop__cloud {
+    position: relative;
+    width: 100%;
+    max-width: 1280px;
+    height: 800px;
+    margin: 0 auto;
+  }
+
+  /* ── Composición central como widget grande ───────────────── */
+  .cop__center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    /* Uso `translate` (propiedad CSS moderna) en vez de `transform: translate()`
+       para que la animación de float pueda operar sobre translate sin pisar
+       el transform que usan otras cosas. */
+    translate: -50% -50%;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 640px;
+    max-width: calc(100% - 48px);
+    gap: 24px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    border-radius: 28px;
+    padding: 56px 56px;
+    box-shadow: 0 50px 120px rgba(0, 0, 0, 0.7);
+    opacity: 0;
+    transition: opacity 1.1s ease-out;
+    /* Float ligero del widget entero (cara + texto se mueven juntos) */
+    animation: copCenterFloat 8s ease-in-out infinite alternate;
+  }
+  .cop__center.is-entered { opacity: 1; }
+  @keyframes copCenterFloat {
+    from { translate: -50% -50%; }
+    to   { translate: -50% calc(-50% - 8px); }
+  }
+
+  /* (El parpadeo se aplica vía JS inline más abajo — la animación CSS
+     se quedaba bloqueada por la cascada del componente VelvzFace, así
+     que aplicamos `animation` por inline-style desde JS, que gana siempre.) */
+
+  /* Override del em para usar el gradiente azul glow IA */
+  .cop__center .section-title {
+    margin: 0;
+  }
+  .cop__center .section-title em {
+    font-style: normal;
+    background: linear-gradient(120deg, #4D99E6 0%, #1A66FF 50%, #003399 100%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: copGradSlide 8s ease-in-out infinite;
+  }
+  @keyframes copGradSlide {
+    0%, 100% { background-position: 0% 50%; }
+    50%      { background-position: 100% 50%; }
+  }
+  .cop__center .section-lead {
+    margin: 0;
+  }
+
+  /* ── Capa 2: cards atmosféricas (background, blureadas) ──── */
+  /* Uso translate + rotate como propiedades separadas (no transform
+     shorthand) para que el animation de float (translate) y el de
+     counter-rotate (rotate) puedan correr juntos sin pisarse. */
+  .cop-atom {
+    position: absolute;
+    translate: -50% -50%;
+    rotate: var(--rot, 0deg);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.025));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 9px 14px;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-sizing: border-box;
+    z-index: 1;
+    /* opacidad target por card (variación de profundidad) — el JS la activa
+       al hacer scroll (animación de aparición) */
+    opacity: 0;
+    filter: blur(var(--blur, 5px));
+    transition: opacity 1s ease-out;
+    animation: copFloat var(--dur, 8s) ease-in-out var(--delay, 0s) infinite alternate;
+  }
+  .cop-atom.is-entered { opacity: var(--target-opacity, 0.5); }
+
+  /* ── Capa 1: insight cards legibles (foreground) ─────────── */
+  .cop-card {
+    position: absolute;
+    translate: -50% -50%;
+    rotate: var(--rot, 0deg);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.025));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border-radius: 18px;
+    padding: 16px 20px;
+    box-shadow: 0 24px 50px rgba(0, 0, 0, 0.5);
+    color: var(--text);
+    z-index: 5;
+    opacity: 0;
+    filter: blur(var(--blur, 0px));
+    transition: opacity 1s ease-out;
+    animation: copFloat var(--dur, 6s) ease-in-out var(--delay, 0s) infinite alternate;
+  }
+  .cop-card.is-entered { opacity: 1; }
+
+  .cop-card--lg { width: 280px; }
+  .cop-card--md { width: 220px; }
+  .cop-card--sm { width: 160px; }
+
+  .cop-card__label {
+    margin: 0 0 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-subtle);
+  }
+  .cop-card__value {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    color: var(--text);
+  }
+  .cop-card--md .cop-card__value { font-size: 22px; }
+  .cop-card--sm .cop-card__value { font-size: 19px; }
+  .cop-card__sub {
+    margin: 6px 0 0;
+    font-size: 12.5px;
+    color: var(--text-muted);
+    line-height: 1.35;
+  }
+
+  /* Float vertical: solo anima translate (rotate se queda fijo) */
+  @keyframes copFloat {
+    from { translate: -50% -50%; }
+    to   { translate: -50% calc(-50% - 12px); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cop-card, .cop-atom, .cop__face { animation: none; }
+    .cop__center .section-title em { animation: none; }
+    /* Sin reduced motion estás esperando JS para opacity. Forzamos visible. */
+    .cop-card { opacity: 1; transition: none; }
+    .cop-atom { opacity: var(--target-opacity, 0.5); transition: none; }
+    .cop__center { opacity: 1; transition: none; }
+  }
+</style>
+
+<!-- Keyframes en estilo global para que esté accesible desde la animación
+     inline que aplica el script de abajo. -->
+<style is:global>
+  @keyframes copFaceBlinkLoop {
+    0%, 38%, 41%, 76%, 79%, 100% { transform: scaleY(1); }
+    39.5%, 77.5%                 { transform: scaleY(0.1); }
+  }
+
+  /* ── Responsive ───────────────────────────────────────────── */
+  @media (max-width: 980px) {
+    .cop__cloud { height: 700px; }
+    .cop-card--lg { width: 240px; }
+    .cop-card--md { width: 190px; }
+    .cop-card--sm { width: 140px; }
+    .cop-card__value { font-size: 22px; }
+    .cop__center { width: 480px; }
+  }
+  @media (max-width: 640px) {
+    .cop__cloud { height: 620px; }
+    .cop-card--lg { width: 200px; padding: 14px 16px; }
+    .cop-card--md { width: 170px; padding: 12px 14px; }
+    .cop-card--sm { width: 130px; padding: 10px 12px; }
+    .cop-card__value { font-size: 18px; }
+    /* Ocultar la mitad de las atmosféricas en móvil para no saturar */
+    .cop-atom:nth-child(odd) { display: none; }
+  }
+</style>

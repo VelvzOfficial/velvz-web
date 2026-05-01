@@ -1,0 +1,451 @@
+---
+/**
+ * Sección 5 — El panel
+ *
+ * Layout (sin wrapper): vídeo y los dos PNG (start/final) son hermanos
+ * directos del <section>, todos en absolute full-bleed con object-fit
+ * contain → el Mac queda centrado a tamaño completo, con hueco negro
+ * natural a izquierda y derecha por la diferencia de aspect ratio.
+ *
+ *   - .panel__final (PNG)  z:1  — frame 2956 limpio, SIEMPRE detrás del
+ *                                  vídeo. Cuando el vídeo se oculta al
+ *                                  `ended`, queda inmediatamente visible.
+ *   - .panel__video        z:2  — la animación. `background: #000` tapa
+ *                                  al panel-final por las zonas transparentes
+ *                                  del HEVC alfa (sino se vería detrás).
+ *   - .panel__start (PNG)  z:3  — frame 0 limpio, visible al inicio.
+ *                                  display:none cuando arranca play().
+ *   - .panel__details      z:4  — absolute en el hueco de la derecha
+ *   - .panel__copy (intro) z:5  — overlay centrado encima de todo
+ *
+ * Comportamiento:
+ *   1. Sección entra en viewport (≥60 %) → panel-start.png cubre el
+ *      primer frame del vídeo. Detalles INVISIBLES. Intro fade-IN (0.35 s).
+ *   2. Intro visible 1 s.
+ *   3. Fade-OUT del intro (0.3 s).
+ *   4. Termina fade → ocultamos panel-start (display:none, listener al
+ *      evento `play`) y arranca video.play(). Los detalles SIGUEN
+ *      INVISIBLES (durante la animación el Mac está en plano completo).
+ *   5. Al `ended` del vídeo: ocultamos el `<video>` con display:none.
+ *      panel-final (z-index 1, siempre opacity 1) queda inmediatamente
+ *      visible — sin opacity transition, sin paint gap, sin flash negro.
+ *      Y fade-IN de los detalles (0.8 s, rise 14 px).
+ */
+---
+
+<section class="panel" id="datos" data-panel>
+  <!-- Sources del vídeo, src de panel-start y panel-final, y poster se
+       inyectan por JS según viewport (desktop o mobile). En móvil la
+       animación es portrait (1170×2532) y termina con el portátil
+       moviéndose HACIA ABAJO — por eso el copy de detalle se posiciona
+       arriba en móvil (el espacio libre queda en la parte superior). -->
+  <video
+    class="panel__video"
+    preload="metadata"
+    muted
+    playsinline
+  ></video>
+
+  <img
+    class="panel__start"
+    alt=""
+    aria-hidden="true"
+    data-panel-start
+  />
+
+  <img
+    class="panel__final"
+    alt=""
+    aria-hidden="true"
+    data-panel-final
+  />
+
+  <!-- Detalles a la derecha del Mac: continuación de la copy. Solo
+       visibles al terminar la animación. -->
+  <div class="panel__details" data-panel-details>
+    <h3 class="panel__details-title">Pide, <em>recibe</em>.</h3>
+    <p>
+      Dile a Velvz qué quieres ver y él se encarga del resto.
+      Gráficas, métricas, notas, datos, lo que necesites.
+    </p>
+  </div>
+
+  <!-- Intro overlay: título centrado sobre toda la sección. -->
+  <div class="panel__copy" data-panel-copy>
+    <h2 class="section-title">
+      Tus datos, <em>a tu medida</em>.
+    </h2>
+  </div>
+</section>
+
+<script is:inline>
+  /* Source injection según viewport. Desktop usa la animación de Mac
+     16:9 (panel.*); móvil usa la portrait 9:19.5 (panel-mobile.*). */
+  (() => {
+    const section = document.querySelector('[data-panel]');
+    if (!section) return;
+    const video = section.querySelector('.panel__video');
+    const startImg = section.querySelector('[data-panel-start]');
+    const finalImg = section.querySelector('[data-panel-final]');
+    if (!video) return;
+
+    const isMobile = window.matchMedia('(max-width: 820px)').matches;
+    const base = isMobile ? '/videos/panel-mobile' : '/videos/panel';
+
+    [
+      [`${base}.mov`,  'video/mp4; codecs=hvc1'],
+      [`${base}.webm`, 'video/webm'],
+      [`${base}.mp4`,  'video/mp4'],
+    ].forEach(([src, type]) => {
+      const source = document.createElement('source');
+      source.src = src;
+      source.type = type;
+      video.appendChild(source);
+    });
+
+    const posterExt = isMobile ? '.jpg' : '.jpg';
+    video.poster = isMobile
+      ? '/videos/panel-mobile-poster.jpg'
+      : '/videos/panel-poster.jpg';
+    if (startImg) startImg.src = `${base}-start.png`;
+    if (finalImg) finalImg.src = `${base}-final.png`;
+
+    video.load();
+  })();
+
+  (() => {
+    const section = document.querySelector('[data-panel]');
+    if (!section) return;
+    const video = section.querySelector('.panel__video');
+    const copy = section.querySelector('[data-panel-copy]');
+    const details = section.querySelector('[data-panel-details]');
+    const startImg = section.querySelector('[data-panel-start]');
+    const finalImg = section.querySelector('[data-panel-final]');
+    if (!video || !copy) return;
+
+    // Listener al evento `play` del vídeo: la forma más fiable de
+    // ocultar el PNG inicial (solo dispara cuando el navegador empieza
+    // a reproducir de verdad).
+    const hideStart = () => {
+      if (startImg) startImg.classList.add('is-hidden');
+    };
+    video.addEventListener('play', hideStart, { once: true });
+
+    // 3 segundos antes del final del vídeo añadimos `.is-dropping` a la
+     // sección. En móvil el CSS de esa clase aplica un translateY(48 px)
+     // simultáneo a `<video>` y `panel-final` (caída del Mac dentro de
+     // la sección) Y hace fade-in de panel-final (opacity 0 → 1). Cuando
+     // el vídeo termine, panel-final ya está a opacity 1 EN LA MISMA
+     // posición que el último frame del vídeo — al ocultar el vídeo no
+     // hay flash negro intermedio. En desktop la clase no hace nada.
+    const addDropping = () => {
+      const dur = video.duration;
+      if (!isFinite(dur) || dur <= 0) return;
+      if (video.currentTime >= Math.max(0, dur - 3)) {
+        section.classList.add('is-dropping');
+        video.removeEventListener('timeupdate', addDropping);
+      }
+    };
+    video.addEventListener('timeupdate', addDropping);
+
+    // Al `ended`:
+    //   - Ocultar el vídeo (`visibility: hidden` — en móvil el vídeo
+    //     dicta la altura de la sección, no podemos sacarlo del flow).
+    //   - Fade-in de los detalles (texto "Pide, recibe.").
+    //   - Añadir `.is-final` a la sección.
+    const showFinal = () => {
+      video.style.visibility = 'hidden';
+      if (details) details.classList.add('is-shown');
+      section.classList.add('is-final');
+    };
+    video.addEventListener('ended', showFinal, { once: true });
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let triggered = false;
+    const start = () => {
+      if (triggered) return;
+      triggered = true;
+
+      if (reduce) {
+        copy.classList.add('is-shown');
+        if (details) details.classList.add('is-shown');
+        return;
+      }
+
+      // En cuanto la sección entra en viewport empezamos a buferear el
+      // vídeo en serio (lo cargábamos solo a metadata). Tenemos 2.7 s de
+      // intro por delante — más que suficiente para tener data lista.
+      video.preload = 'auto';
+      try { video.load(); } catch (_) { /* navegadores antiguos */ }
+
+      // Intro fade-IN (0.35 s) → 1 s lectura → fade-OUT (0.3 s) → play
+      // (Mitad de la duración original — el intro era demasiado largo)
+      requestAnimationFrame(() => {
+        copy.classList.add('is-shown');
+      });
+
+      setTimeout(() => {
+        copy.classList.remove('is-shown');
+        copy.classList.add('is-fading');
+        setTimeout(() => {
+          hideStart(); // backup explícito por si `play` falla
+          video.play().catch(() => {
+            // Si play falla, restauramos el PNG inicial visible.
+            if (startImg) startImg.classList.remove('is-hidden');
+          });
+        }, 300);
+      }, 350 + 1000);
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.intersectionRatio >= 0.6) {
+            io.disconnect();
+            start();
+            return;
+          }
+        }
+      },
+      { threshold: [0.6] }
+    );
+    io.observe(section);
+  })();
+</script>
+
+<style>
+  .panel {
+    position: relative;
+    background: #000;
+    min-height: 100vh;
+    overflow: hidden;
+    /* Sin z-index: el halo del SectionDivider puede asomar dentro de
+       la sección como en el resto del sitio (decisión revertida). */
+  }
+
+  /* Vídeo y los dos PNG (start/final): full-bleed contain centrado.
+     Mismo truco que el Hero para evitar flash negro al final:
+       - panel-final SIEMPRE pintado detrás del vídeo (z-index 1, opacity
+         1, sin transition). Tapado por el vídeo durante la animación.
+       - vídeo encima (z-index 2) con `background: #000` propio. Como el
+         HEVC alfa tiene transparencia alrededor del laptop, esa zona
+         transparente muestra el bg negro del vídeo (NO el panel-final
+         de detrás). Así el final no se ve durante la animación.
+       - panel-start arriba del todo (z-index 3) hasta que arranca play. */
+  .panel__video,
+  .panel__start,
+  .panel__final {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    display: block;
+    pointer-events: none;
+  }
+
+  .panel__final {
+    z-index: 1; /* DETRÁS del vídeo, siempre visible (tapado por él) */
+  }
+
+  .panel__video {
+    z-index: 2;
+    background: #000; /* tapa al panel-final por las zonas transparentes */
+  }
+
+  /* PNG inicial: arriba del todo, visible al inicio, display:none al `play`. */
+  .panel__start {
+    z-index: 3;
+  }
+  .panel__start.is-hidden {
+    display: none;
+  }
+
+  /* Detalles a la derecha. Absolute en la mitad derecha. Pisa la zona
+     transparente del HEVC alfa del Mac, así no se ve acorralado. Texto
+     justificado a la derecha — el bloque queda anclado al borde derecho
+     del viewport y la línea termina recta donde el ojo la espera. */
+  .panel__details {
+    position: absolute;
+    right: clamp(32px, 5vw, 96px);
+    top: 50%;
+    transform: translateY(calc(-50% + 14px));
+    width: clamp(360px, 32vw, 500px);
+    z-index: 4;
+    color: var(--text);
+    text-align: right;
+    opacity: 0;
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    pointer-events: none;
+  }
+  .panel__details.is-shown {
+    opacity: 1;
+    transform: translateY(-50%);
+    pointer-events: auto;
+  }
+
+  /* Tipografía: usa los mismos tamaños/proporciones que `.section-title`
+     y `.section-lead` global (no escalado), para que el bloque tenga
+     la misma jerarquía tipográfica que el resto de títulos del sitio. */
+  .panel__details-title {
+    margin: 0 0 18px;
+    font-size: clamp(34px, 5.4vw, 68px);
+    font-weight: 700;
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    color: var(--text);
+  }
+  .panel__details-title em {
+    font-style: normal;
+    background: linear-gradient(120deg, #4D99E6 0%, #1A66FF 50%, #003399 100%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: panelGradSlide 8s ease-in-out infinite;
+  }
+
+  .panel__details p {
+    margin: 0 0 14px;
+    color: var(--text-muted);
+    font-size: clamp(16px, 1.3vw, 19px);
+    line-height: 1.55;
+  }
+  .panel__details p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Intro overlay: título + lead centrados sobre toda la sección.
+     Como el Mac está full-bleed centrado, el intro cae sobre el portátil. */
+  .panel__copy {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    z-index: 5;
+    padding: 0 24px;
+    opacity: 0;
+    transition: opacity 0.35s ease-out;
+    pointer-events: none;
+  }
+  .panel__copy.is-shown {
+    opacity: 1;
+  }
+  .panel__copy.is-fading {
+    opacity: 0;
+  }
+
+  .panel__copy .section-title {
+    margin: 0 0 18px;
+    max-width: 720px;
+  }
+  .panel__copy .section-title em {
+    font-style: normal;
+    background: linear-gradient(120deg, #4D99E6 0%, #1A66FF 50%, #003399 100%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: panelGradSlide 8s ease-in-out infinite;
+  }
+  @keyframes panelGradSlide {
+    0%, 100% { background-position: 0% 50%; }
+    50%      { background-position: 100% 50%; }
+  }
+  .panel__copy .section-lead {
+    margin: 0 auto;
+    max-width: 540px;
+  }
+
+  /* Móvil: la sección NO va al alto nativo del vídeo (1170×2532) — la
+     animación deja ~900 px de transparente arriba y ~600 px abajo
+     (frame útil entre y≈900 y y≈1900 del original). Usamos un aspect
+     más comprimido (1170/1700 ≈ 67 % del alto original) y `object-fit:
+     cover` recorta los grandes vacíos transparentes. En iPhone 390w la
+     sección queda en ~567 px en vez de los ~844 px del aspect natural,
+     dejando margen suficiente para el drop de 75 px del Mac al final. */
+  @media (max-width: 820px) {
+    .panel {
+      min-height: auto;
+      height: auto;
+      aspect-ratio: 1170 / 1700;
+      overflow: hidden;
+    }
+    /* Vídeo y PNGs full-bleed, ocupan toda la sección */
+    .panel__video,
+    .panel__start,
+    .panel__final {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    /* Drop del Mac: 3 s antes del end del vídeo, JS añade `.is-dropping`.
+       Vídeo y panel-final transladan 48 px hacia abajo CON LA MISMA
+       transición 3 s — quedan alineados píxel a píxel durante toda la
+       caída (al estar superpuestos, las zonas alfa del HEVC asoman a un
+       panel-final EN LA MISMA POSICIÓN, así que no hay artefacto visual).
+       En paralelo, panel-final hace fade-in (1 s) — para cuando el vídeo
+       termine ya está a opacity 1 en la misma pose que el último frame.
+       Al ocultar el vídeo en `ended` no hay paint gap ni flash negro.
+       En desktop la clase no afecta a nada (ahí panel-final ya está
+       siempre a opacity 1 detrás del vídeo, mismo truco distinto). */
+    .panel__video {
+      transition: transform 3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .panel__final {
+      opacity: 0;
+      transform: translateY(0);
+      transition: opacity 1s ease-out, transform 3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .panel.is-dropping .panel__video,
+    .panel.is-dropping .panel__final {
+      transform: translateY(75px);
+    }
+    .panel.is-dropping .panel__final {
+      opacity: 1;
+    }
+
+    /* Detalles centrados arriba en el escaso margen transparente que
+       queda tras el crop. Tipografía conservadora — la sección comprimida
+       deja unos ~130 px de hueco encima del laptop, hay que caber. */
+    .panel__details {
+      position: absolute;
+      top: 22%;
+      bottom: auto;
+      left: 50%;
+      right: auto;
+      transform: translateX(-50%) translateY(14px);
+      width: calc(100% - 32px);
+      max-width: 600px;
+      margin: 0;
+      padding: 0 16px;
+      text-align: center;
+    }
+    .panel__details.is-shown {
+      transform: translateX(-50%) translateY(0);
+    }
+    .panel__details-title {
+      font-size: clamp(28px, 7.5vw, 44px);
+      margin-bottom: 10px;
+    }
+    .panel__details p {
+      font-size: clamp(15px, 3.8vw, 18px);
+      line-height: 1.4;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .panel__copy .section-title em { animation: none; }
+    .panel__details-title em { animation: none; }
+    .panel__details { transition: none; }
+  }
+</style>

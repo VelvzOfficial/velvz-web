@@ -1,0 +1,192 @@
+/* ─────────────────────────────────────────────────────────────
+   Velvz — design tokens, base reset & shared utilities
+   ───────────────────────────────────────────────────────────── */
+
+:root {
+  /* Surface */
+  --bg: #050507;
+  --bg-elev: #0E0F12;
+  --bg-card: rgba(255, 255, 255, 0.04);
+  --bg-card-hover: rgba(255, 255, 255, 0.06);
+
+  /* Text */
+  --text: #FFFFFF;
+  --text-muted: #A4A4AC;
+  --text-subtle: #6E6E78;
+
+  /* Accent — system blue (real de la app) */
+  --accent: #0A84FF;
+  --accent-2: #4DA3FF;
+  --accent-soft: rgba(10, 132, 255, 0.16);
+  --accent-glow: rgba(10, 132, 255, 0.45);
+  /* Antiguo --violet redefinido al azul oscuro oficial. La paleta de
+     marca son DOS azules: claro #4D99E6 y oscuro #003399, con #1A66FF
+     como punto medio para los gradientes. Sin morados. */
+  --accent-deep: #003399;
+  --accent-deep-glow: rgba(0, 51, 153, 0.45);
+  /* Aliases legacy — mismos valores que los anteriores ahora apuntando a
+     azul oscuro. Cualquier `var(--violet)` que asome en el código pinta
+     ya azul navy, no morado. */
+  --violet: #003399;
+  --violet-glow: rgba(0, 51, 153, 0.45);
+
+  /* Semantics from app */
+  --green: #34D158;
+  --red: #FF6961;
+  --orange: #FF9F0A;
+  --yellow: #FFD60A;
+
+  /* Face — gris sistema dark mode */
+  --face: #8E8E93;
+
+  /* Borders */
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+  --border-accent: rgba(10, 132, 255, 0.35);
+
+  /* Type */
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
+    'Inter', system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'SF Mono', ui-monospace, 'JetBrains Mono', Menlo, monospace;
+
+  /* Layout */
+  --container: 1280px;
+  --container-wide: 1440px;
+  --container-tight: 1080px;
+
+  /* Radius */
+  --radius-sm: 10px;
+  --radius: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-pill: 999px;
+
+  /* Section rhythm */
+  --section-py: clamp(96px, 14vw, 200px);
+}
+
+/* ── Reset ─────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+img, svg, video { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+button, input, textarea { font-family: inherit; color: inherit; }
+
+::selection { background: var(--accent); color: #fff; }
+
+/* ── Container ─────────────────────────────────────────────── */
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+.container--wide { max-width: var(--container-wide); }
+.container--tight { max-width: var(--container-tight); }
+
+/* ── Section heading util ──────────────────────────────────── */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-2);
+}
+.eyebrow::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.section-title {
+  margin: 14px 0 18px;
+  font-size: clamp(34px, 5.4vw, 68px);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+}
+.section-title em {
+  font-style: normal;
+  /* Gradiente oficial de marca: azul claro → medio → oscuro. Sin morado. */
+  background: linear-gradient(120deg, #4D99E6 0%, #1A66FF 50%, #003399 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.section-lead {
+  font-size: clamp(16px, 1.3vw, 19px);
+  line-height: 1.55;
+  color: var(--text-muted);
+  max-width: 60ch;
+}
+
+/* ── Reveal on scroll (IntersectionObserver) ───────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0s);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Grain overlay (SVG inline noise) ──────────────────────── */
+.grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-size: 240px 240px;
+  z-index: 0;
+}
+
+/* ── Glass card ────────────────────────────────────────────── */
+.glass {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  border: 1px solid var(--border);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border-radius: var(--radius-lg);
+}
+
+/* ── Reduced motion ────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.2s !important;
+  }
+  .reveal { opacity: 1; transform: none; }
+  html { scroll-behavior: auto; }
+}

@@ -1,0 +1,277 @@
+---
+/**
+ * Sección 6 — Dispositivos
+ * El escenario clásico con los 3 mockups: iPad atrás-izquierda, Mac
+ * centrado, iPhone delante-derecha. Parallax sutil al mover el ratón.
+ */
+---
+
+<section class="devs">
+  <div class="devs__bg" aria-hidden="true">
+    <div class="devs__halo devs__halo--blue"></div>
+    <div class="devs__halo devs__halo--violet"></div>
+  </div>
+
+  <div class="container container--tight devs__head">
+    <span class="eyebrow reveal">Apple en serio</span>
+    <h2 class="section-title reveal" style="--reveal-delay: .1s">
+      iPhone, iPad y Mac.<br /><em>Diseñada para los tres.</em>
+    </h2>
+    <p class="section-lead reveal" style="--reveal-delay: .2s">
+      Nada de envoltorios web. SwiftUI nativo, Liquid Glass, atajos de
+      teclado, widgets de sistema, Siri y Spotlight. Tus libros viven en tu
+      iCloud y aparecen sincronizados al instante en cada dispositivo.
+    </p>
+  </div>
+
+  <div class="devs__stage reveal" style="--reveal-delay: .3s" aria-hidden="true">
+    <div class="devs__stage-glow"></div>
+
+    <div class="devs__device devs__device--ipad">
+      <img src="/mockups/copiloto-ipad.png" alt="" />
+    </div>
+    <div class="devs__device devs__device--mac">
+      <img src="/mockups/panel-mac.png" alt="" />
+    </div>
+    <div class="devs__device devs__device--phone">
+      <img src="/mockups/suscripciones-iphone.png" alt="" />
+    </div>
+
+    <div class="devs__floor"></div>
+  </div>
+
+  <ul class="devs__feats container container--tight">
+    <li class="reveal" style="--reveal-delay: .5s">
+      <span class="devs__feat-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M6 10h2M10 10h2M14 10h2M6 14h12"/></svg>
+      </span>
+      <p class="devs__feat-t">Atajos y barra ⌘ K</p>
+      <p class="devs__feat-s">Lo encuentras todo sin levantar las manos.</p>
+    </li>
+    <li class="reveal" style="--reveal-delay: .6s">
+      <span class="devs__feat-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="3"/><circle cx="12" cy="17" r="1"/></svg>
+      </span>
+      <p class="devs__feat-t">Widgets nativos</p>
+      <p class="devs__feat-s">Saldo y gastos en tu pantalla de inicio.</p>
+    </li>
+    <li class="reveal" style="--reveal-delay: .7s">
+      <span class="devs__feat-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 8h18M3 16h18"/></svg>
+      </span>
+      <p class="devs__feat-t">Siri & Spotlight</p>
+      <p class="devs__feat-s">"¿Qué he gastado este mes?" — y listo.</p>
+    </li>
+    <li class="reveal" style="--reveal-delay: .8s">
+      <span class="devs__feat-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4M3 17l9 4 9-4"/></svg>
+      </span>
+      <p class="devs__feat-t">Sync por iCloud</p>
+      <p class="devs__feat-s">Cifrado de Apple, sin servidores intermedios.</p>
+    </li>
+  </ul>
+</section>
+
+<style>
+  .devs {
+    position: relative;
+    isolation: isolate;
+    padding: var(--section-py) 0;
+    overflow: hidden;
+  }
+  .devs__bg { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+  .devs__halo {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(140px);
+  }
+  .devs__halo--blue {
+    width: 900px; height: 900px;
+    top: 10%; left: 50%;
+    transform: translateX(-50%);
+    background: radial-gradient(circle, var(--accent) 0%, transparent 65%);
+    opacity: 0.18;
+  }
+  .devs__halo--violet {
+    width: 600px; height: 600px;
+    bottom: 0; right: -10%;
+    background: radial-gradient(circle, var(--violet) 0%, transparent 70%);
+    opacity: 0.14;
+  }
+
+  .devs__head { text-align: center; margin-bottom: 64px; }
+  .devs__head .section-lead { margin: 0 auto; }
+
+  /* Stage */
+  .devs__stage {
+    position: relative;
+    width: 100%;
+    max-width: 1500px;
+    margin: 0 auto;
+    perspective: 2400px;
+    perspective-origin: 50% 30%;
+    padding: 0 24px 80px;
+    height: clamp(420px, 48vw, 640px);
+  }
+  .devs__stage-glow {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 80%;
+    height: 240px;
+    transform: translateX(-50%);
+    background: radial-gradient(ellipse at center, rgba(10, 132, 255, 0.45) 0%, transparent 65%);
+    filter: blur(60px);
+    pointer-events: none;
+  }
+  .devs__device {
+    position: absolute;
+    transform-style: preserve-3d;
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .devs__device img {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 30px 80px rgba(0, 0, 0, 0.7));
+  }
+
+  .devs__device--ipad {
+    left: 4%;
+    top: 18%;
+    width: 28%;
+    transform: rotateY(22deg) rotateX(4deg) translateZ(-60px);
+    z-index: 1;
+    opacity: 0.95;
+  }
+  .devs__device--mac {
+    left: 50%;
+    top: 8%;
+    transform: translateX(-50%) rotateX(2deg);
+    width: 70%;
+    z-index: 2;
+  }
+  .devs__device--mac img {
+    filter:
+      drop-shadow(0 60px 120px rgba(10, 132, 255, 0.3))
+      drop-shadow(0 30px 60px rgba(0, 0, 0, 0.65));
+  }
+  .devs__device--phone {
+    right: 4%;
+    bottom: 0;
+    width: 16%;
+    transform: rotateY(-18deg) rotateX(2deg) translateZ(80px);
+    z-index: 3;
+    animation: phoneFloat 7s ease-in-out infinite;
+  }
+  @keyframes phoneFloat {
+    0%, 100% { transform: rotateY(-18deg) rotateX(2deg) translateZ(80px) translateY(0); }
+    50%      { transform: rotateY(-18deg) rotateX(2deg) translateZ(80px) translateY(-14px); }
+  }
+  .devs__floor {
+    position: absolute;
+    left: 0; right: 0;
+    bottom: -40px;
+    height: 200px;
+    background: linear-gradient(to bottom, transparent 0%, var(--bg) 70%);
+    pointer-events: none;
+  }
+
+  /* Feature grid */
+  .devs__feats {
+    list-style: none;
+    margin: 0 auto;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 28px;
+  }
+  .devs__feats li {
+    padding: 22px;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015));
+    border: 1px solid var(--border);
+    transition: border-color 0.3s ease, transform 0.3s ease;
+  }
+  .devs__feats li:hover {
+    border-color: var(--border-strong);
+    transform: translateY(-3px);
+  }
+  .devs__feat-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-sm);
+    background: var(--accent-soft);
+    color: var(--accent-2);
+    margin-bottom: 14px;
+  }
+  .devs__feat-icon svg { width: 18px; height: 18px; }
+  .devs__feat-t { margin: 0 0 4px; font-size: 15.5px; font-weight: 600; }
+  .devs__feat-s { margin: 0; font-size: 13.5px; color: var(--text-muted); line-height: 1.5; }
+
+  @media (max-width: 1100px) {
+    .devs__device--ipad { width: 26%; left: 2%; }
+    .devs__device--phone { width: 18%; right: 2%; }
+    .devs__feats { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 720px) {
+    .devs__stage { height: clamp(320px, 80vw, 460px); }
+    .devs__device--ipad,
+    .devs__device--phone { display: none; }
+    .devs__device--mac { width: 100%; top: 0; }
+  }
+  @media (max-width: 540px) {
+    .devs__feats { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .devs__device--phone { animation: none; }
+  }
+</style>
+
+<script is:inline>
+  // Parallax sutil del stage
+  (() => {
+    const stage = document.querySelector('.devs__stage');
+    if (!stage) return;
+    const ipad = stage.querySelector('.devs__device--ipad');
+    const mac = stage.querySelector('.devs__device--mac');
+    const phone = stage.querySelector('.devs__device--phone');
+    if (!ipad || !mac || !phone) return;
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (window.matchMedia('(max-width: 720px)').matches) return;
+
+    let raf = 0;
+    let targetX = 0, targetY = 0;
+    let curX = 0, curY = 0;
+
+    const onMove = (e) => {
+      const rect = stage.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      targetX = (e.clientX - cx) / rect.width;
+      targetY = (e.clientY - cy) / rect.height;
+      if (!raf) raf = requestAnimationFrame(loop);
+    };
+
+    const loop = () => {
+      curX += (targetX - curX) * 0.08;
+      curY += (targetY - curY) * 0.08;
+
+      ipad.style.setProperty('transform',
+        `rotateY(${22 - curX * 6}deg) rotateX(${4 - curY * 4}deg) translateZ(-60px) translate(${curX * -10}px, ${curY * -8}px)`);
+      mac.style.setProperty('transform',
+        `translateX(-50%) rotateX(${2 - curY * 2}deg) rotateY(${curX * -2}deg) translate(${curX * 6}px, ${curY * 4}px)`);
+
+      if (Math.abs(targetX - curX) > 0.001 || Math.abs(targetY - curY) > 0.001) {
+        raf = requestAnimationFrame(loop);
+      } else {
+        raf = 0;
+      }
+    };
+
+    window.addEventListener('mousemove', onMove, { passive: true });
+  })();
+</script>

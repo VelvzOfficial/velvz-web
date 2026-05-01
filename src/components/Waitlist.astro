@@ -1,0 +1,486 @@
+---
+/**
+ * Sección 8 — Waitlist + Footer
+ * Carita pequeña parpadeando como cierre, formulario de email y footer
+ * minimal. El form es maquetación pura: sin endpoint todavía (pendiente de
+ * decidir backend para recoger correos).
+ */
+import VelvzFace from './VelvzFace.astro';
+---
+
+<section class="wl" id="waitlist">
+  <div class="wl__bg" aria-hidden="true"></div>
+
+  <div class="container container--tight wl__inner">
+    <div class="wl__face reveal" aria-hidden="true">
+      <div class="wl__face-halo"></div>
+      <VelvzFace size={130} color="#FFFFFF" />
+    </div>
+
+    <h2 class="wl__title reveal" style="--reveal-delay: .1s">
+      Sé de los <em>primeros</em>.
+    </h2>
+    <p class="wl__lead reveal" style="--reveal-delay: .2s">
+      Solicita acceso a la beta de Velvz.
+    </p>
+
+    <form class="wl__form reveal" style="--reveal-delay: .3s" data-wl-form novalidate>
+      <label class="wl__label" for="wl-email">Correo electrónico</label>
+      <div class="wl__field" data-wl-field>
+        <input
+          id="wl-email"
+          type="email"
+          name="email"
+          autocomplete="email"
+          required
+          placeholder="tu@correo.com"
+          pattern="[^\s@]+@[^\s@]+\.[^\s@]{2,}"
+          maxlength="320"
+          data-wl-input
+        />
+        <button type="submit" data-wl-submit>
+          <span data-wl-btn-label>Solicitar beta</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14M13 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+      <p class="wl__msg" data-wl-msg aria-live="polite"></p>
+      <!-- Honeypot: campo invisible que solo bots rellenan. Si llega con
+           contenido, el envío se descarta silenciosamente. -->
+      <input
+        type="text"
+        name="company"
+        tabindex="-1"
+        autocomplete="off"
+        class="wl__honeypot"
+        aria-hidden="true"
+        data-wl-honeypot
+      />
+    </form>
+
+    <script is:inline>
+      (() => {
+        const form = document.querySelector('[data-wl-form]');
+        if (!form) return;
+        const field = form.querySelector('[data-wl-field]');
+        const input = form.querySelector('[data-wl-input]');
+        const button = form.querySelector('[data-wl-submit]');
+        const btnLabel = form.querySelector('[data-wl-btn-label]');
+        const msg = form.querySelector('[data-wl-msg]');
+        const honeypot = form.querySelector('[data-wl-honeypot]');
+
+        // Validación: algo@algo.tld (TLD ≥ 2 letras, sin espacios)
+        const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+        // Backend en Railway (proyecto velvz-waitlist) — guarda en SQLite
+        // sobre volumen persistente. CORS limitado a velvz.com + localhost.
+        const ENDPOINT = 'https://velvz-waitlist-production.up.railway.app/waitlist';
+
+        const setMessage = (text, type) => {
+          msg.textContent = text || '';
+          msg.classList.remove('is-error', 'is-success');
+          if (type === 'error') msg.classList.add('is-error');
+          if (type === 'success') msg.classList.add('is-success');
+          msg.classList.toggle('is-visible', !!text);
+        };
+
+        const setError = (on) => {
+          field.classList.toggle('is-error', !!on);
+        };
+
+        const validate = (showError) => {
+          const value = (input.value || '').trim();
+          const ok = EMAIL_RE.test(value);
+          if (!ok && showError) {
+            setError(true);
+            setMessage('Introduce un correo válido', 'error');
+          } else if (ok) {
+            setError(false);
+            setMessage('', null);
+          }
+          return ok;
+        };
+
+        input.addEventListener('blur', () => {
+          if ((input.value || '').trim().length > 0) validate(true);
+        });
+
+        // Al empezar a corregir, limpiamos el estado de error
+        input.addEventListener('input', () => {
+          if (field.classList.contains('is-error')) {
+            setError(false);
+            setMessage('', null);
+          }
+        });
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+
+          // Honeypot: si tiene contenido, descartamos sin avisar
+          if (honeypot && honeypot.value) return;
+
+          if (!validate(true)) {
+            input.focus();
+            return;
+          }
+
+          const email = input.value.trim();
+          field.classList.add('is-loading');
+          button.disabled = true;
+          btnLabel.textContent = 'Enviando…';
+          setMessage('', null);
+
+          try {
+            const res = await fetch(ENDPOINT, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email }),
+            });
+
+            if (res.ok) {
+              setMessage('¡Listo! Te avisamos cuando abramos beta.', 'success');
+              input.value = '';
+              btnLabel.textContent = 'Enviado ✓';
+              // El botón queda deshabilitado tras éxito
+            } else {
+              const data = await res.json().catch(() => ({}));
+              const errMsg = data && data.error
+                ? data.error
+                : 'Algo falló. Inténtalo de nuevo.';
+              setMessage(errMsg, 'error');
+              button.disabled = false;
+              btnLabel.textContent = 'Solicitar beta';
+            }
+          } catch (err) {
+            setMessage('No pudimos conectar. Revisa tu conexión.', 'error');
+            button.disabled = false;
+            btnLabel.textContent = 'Solicitar beta';
+          } finally {
+            field.classList.remove('is-loading');
+          }
+        });
+      })();
+    </script>
+  </div>
+</section>
+
+<footer class="ft">
+  <div class="container container--wide ft__inner">
+    <a href="#top" class="ft__brand" aria-label="Velvz inicio">
+      <img src="/velvz-icon.png" alt="" class="ft__logo" width="28" height="28" />
+      <span class="ft__wordmark">Velvz</span>
+    </a>
+    <nav class="ft__nav" aria-label="Pie de página">
+      <a href="/privacy">Privacidad</a>
+      <a href="/terms">Condiciones</a>
+      <a href="/support">Soporte</a>
+    </nav>
+    <p class="ft__copy">© 2026 Velvz · Hecho en España</p>
+  </div>
+</footer>
+
+<style>
+  .wl {
+    position: relative;
+    isolation: isolate;
+    /* Sección más larga (×1.6) — el halo necesita aire para diluirse
+       gradualmente. Antes era ×1.6 abajo y ×1 arriba; ahora simétrico. */
+    padding: calc(var(--section-py) * 1.6) 0;
+    text-align: center;
+    overflow: hidden;
+  }
+  /* Halo radial gigante (mucho más ancho y alto que la sección visible).
+     Solo se ve la "cola" suave del gradiente cerca del centro — los
+     bordes (donde la sección está recortando) ya están en la zona casi
+     transparente, así que blend natural con el negro de las secciones
+     vecinas (Privacidad arriba, footer abajo). */
+  .wl__bg {
+    position: absolute;
+    /* Extiende ~40% por encima/debajo del viewport para que la transición
+       sea SOLO la cola del gradiente. El overflow:hidden de .wl recorta. */
+    top: -40%;
+    bottom: -40%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 140%;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(
+        ellipse 45% 35% at 50% 50%,
+        rgba(26, 102, 255, 0.35) 0%,
+        rgba(0, 51, 153, 0.18) 30%,
+        rgba(77, 153, 230, 0.06) 55%,
+        transparent 75%
+      );
+    filter: blur(60px);
+    animation: wlBreathe 11s ease-in-out infinite;
+  }
+  @keyframes wlBreathe {
+    0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.85; }
+    50%      { transform: translateX(-50%) scale(1.05); opacity: 1; }
+  }
+
+  .wl__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .wl__face {
+    position: relative;
+    margin-bottom: 30px;
+  }
+  .wl__face-halo {
+    position: absolute;
+    inset: -80px;
+    background: radial-gradient(circle, rgba(10,132,255,0.5) 0%, transparent 60%);
+    filter: blur(40px);
+    pointer-events: none;
+    animation: wlBreathe 6s ease-in-out infinite;
+  }
+
+  .wl__title {
+    margin: 0 0 16px;
+    font-size: clamp(38px, 6vw, 76px);
+    font-weight: 700;
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+  }
+  .wl__title em {
+    font-style: normal;
+    background: linear-gradient(120deg, #4D99E6 0%, #1A66FF 50%, #003399 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .wl__lead {
+    margin: 0 auto 36px;
+    font-size: clamp(15px, 1.3vw, 18px);
+    color: var(--text-muted);
+    max-width: 520px;
+  }
+
+  .wl__form {
+    width: 100%;
+    max-width: 540px;
+  }
+  .wl__label {
+    position: absolute;
+    width: 1px; height: 1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+  }
+  .wl__field {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 6px 6px 18px;
+    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-strong);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .wl__field:focus-within {
+    border-color: var(--border-accent);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+  }
+  .wl__field input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    padding: 12px 0;
+    color: var(--text);
+  }
+  .wl__field input::placeholder { color: var(--text-subtle); }
+
+  .wl__field button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 22px;
+    border: none;
+    border-radius: var(--radius-pill);
+    background: linear-gradient(120deg, #4D99E6 0%, #1A66FF 50%, #003399 100%);
+    color: #fff;
+    font-size: 14.5px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow:
+      0 8px 28px rgba(10, 132, 255, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .wl__field button:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      0 14px 36px rgba(10, 132, 255, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+  .wl__field button svg { width: 16px; height: 16px; }
+  .wl__field button[disabled],
+  .wl__field.is-loading button {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+  }
+  .wl__field button[disabled]:hover {
+    transform: none;
+    box-shadow:
+      0 8px 28px rgba(10, 132, 255, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
+
+  /* Estado de error (input válido HTML5 + JS): borde rojo y mensaje
+     debajo en rojo (.wl__msg.is-error). El éxito muestra mensaje verde. */
+  .wl__field.is-error {
+    border-color: rgba(255, 105, 97, 0.55);
+    box-shadow: 0 0 0 4px rgba(255, 105, 97, 0.12);
+  }
+  .wl__msg {
+    margin: 14px auto 0;
+    font-size: 13px;
+    color: var(--text-subtle);
+    min-height: 18px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(-2px);
+    transition: opacity 0.25s ease, transform 0.25s ease, color 0.2s ease;
+  }
+  .wl__msg.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .wl__msg.is-error   { color: #FF6961; }
+  .wl__msg.is-success { color: #34D158; }
+
+  /* Honeypot — invisible para humanos pero existente para bots */
+  .wl__honeypot {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Footer */
+  .ft {
+    border-top: 1px solid var(--border);
+    padding: 36px 0 56px;
+  }
+  /* 3 columnas iguales → el nav del medio queda CENTRADO en el viewport
+     (con space-between solo quedaba "entre" logo y copy, no en el centro). */
+  .ft__inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
+    gap: 24px;
+  }
+  .ft__inner .ft__brand { justify-self: start; }
+  .ft__inner .ft__nav   { justify-self: center; }
+  .ft__inner .ft__copy  { justify-self: end; }
+  .ft__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text);
+    transition: opacity 0.2s ease;
+  }
+  .ft__brand:hover { opacity: 0.85; }
+  .ft__logo {
+    width: 28px;
+    height: 28px;
+    display: block;
+    image-rendering: -webkit-optimize-contrast;
+  }
+  .ft__wordmark {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 0.005em;
+  }
+  .ft__nav {
+    display: flex;
+    gap: 22px;
+    font-size: 13.5px;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .ft__nav a {
+    transition: color 0.2s ease;
+  }
+  .ft__nav a:hover { color: var(--text); }
+  .ft__copy {
+    margin: 0;
+    font-size: 12.5px;
+    color: var(--text-subtle);
+  }
+
+  @media (max-width: 720px) {
+    /* Input y botón pasan a ser elementos separados (no unificados en
+       un contenedor pill). El contenedor `wl__field` se vuelve transparente
+       y solo organiza el flow vertical. Input y botón heredan estilos
+       propios — más cómodo táctilmente y proporciones más limpias. */
+    .wl__field {
+      flex-direction: column;
+      padding: 0;
+      gap: 12px;
+      background: transparent;
+      border: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    .wl__field:focus-within {
+      border-color: transparent;
+      box-shadow: none;
+    }
+    .wl__field input {
+      width: 100%;
+      padding: 16px 22px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-pill);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      text-align: center;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .wl__field input:focus {
+      border-color: var(--border-accent);
+      box-shadow: 0 0 0 4px var(--accent-soft);
+    }
+    .wl__field button {
+      width: 100%;
+      padding: 16px 24px;
+      justify-content: center;
+    }
+    /* En móvil el input tiene su propio borde — el error se pinta ahí, no
+       en el contenedor. */
+    .wl__field.is-error {
+      box-shadow: none;
+      border-color: transparent;
+    }
+    .wl__field.is-error input {
+      border-color: rgba(255, 105, 97, 0.55);
+      box-shadow: 0 0 0 4px rgba(255, 105, 97, 0.12);
+    }
+
+    .ft__inner {
+      grid-template-columns: 1fr;
+      gap: 16px;
+      text-align: center;
+    }
+    .ft__inner .ft__brand,
+    .ft__inner .ft__nav,
+    .ft__inner .ft__copy { justify-self: center; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wl__halo, .wl__face-halo { animation: none; }
+  }
+</style>
