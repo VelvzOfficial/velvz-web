@@ -267,6 +267,7 @@ const rows = [
   @media (max-width: 640px) {
     .bcard { width: 168px; height: 104px; padding: 12px 14px; }
     .bcard__name { font-size: 16px; }
-    .banco__row--3 { display: none; } /* 2 filas en móvil */
+    /* 3 filas en móvil — antes ocultábamos la 3ª, ahora se mantiene
+       (el track infinito sigue funcionando bien con tarjetas más pequeñas). */
   }
 </style>

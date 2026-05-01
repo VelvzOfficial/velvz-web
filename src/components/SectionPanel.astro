@@ -388,6 +388,13 @@
       object-position: center;
     }
 
+    /* En móvil ocultamos el panel-start (PNG del Mac cerrado) — el
+       primer frame del propio vídeo cubre esa función. Así evitamos
+       que el render del Mac aparezca como fondo durante la sección. */
+    .panel__start {
+      display: none;
+    }
+
     /* Drop del Mac: 3 s antes del end del vídeo, JS añade `.is-dropping`.
        Vídeo y panel-final transladan 48 px hacia abajo CON LA MISMA
        transición 3 s — quedan alineados píxel a píxel durante toda la

@@ -32,9 +32,7 @@ import VelvzFace from './VelvzFace.astro';
     </h1>
 
     <p class="hero__subtitle">
-      Visualiza tu dinero en lenguaje natural, sin hojas de cálculo. Háblale
-      a Velvz como a un contable de confianza y deja que ordene tus finanzas
-      por ti.
+      Visualiza tu dinero en lenguaje natural.
     </p>
 
     <div class="hero__cta-wrap">
@@ -340,12 +338,18 @@ import VelvzFace from './VelvzFace.astro';
       padding: 0;
     }
 
+    /* En móvil dejamos hueco negro arriba (~72 px) para que el iPhone
+       de la animación no se superponga con el header fijo. El video y
+       PNG arrancan tras esa franja en lugar de inset:0. */
     .hero__video,
     .hero__final {
       position: absolute;
-      inset: 0;
+      top: 72px;
+      left: 0;
+      right: 0;
+      bottom: 0;
       width: 100%;
-      height: 100%;
+      height: calc(100% - 72px);
       object-fit: contain;
       object-position: center;
       transform: none; /* sin scale ni translate en móvil */
