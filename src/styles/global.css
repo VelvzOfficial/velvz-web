@@ -180,6 +180,78 @@ button, input, textarea { font-family: inherit; color: inherit; }
   border-radius: var(--radius-lg);
 }
 
+/* ── Páginas legales (privacy, terms, support) ────────────────
+   Estilos compartidos por las tres páginas. Antes vivían en
+   privacy.astro con `is:global` — eso funcionaba si visitabas
+   /privacy primero pero no si entrabas directo a /terms. */
+.legal {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 56px 24px 96px;
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+.legal__back {
+  display: inline-block;
+  margin-bottom: 32px;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 15px;
+  transition: opacity 0.2s ease;
+}
+.legal__back:hover { opacity: 0.75; }
+.legal h1 {
+  font-size: clamp(28px, 4.5vw, 36px);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.legal__date {
+  color: var(--text-subtle);
+  font-size: 14px;
+  margin-bottom: 40px;
+}
+.legal h2 {
+  font-size: clamp(17px, 2.2vw, 20px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin: 36px 0 12px;
+}
+.legal p,
+.legal li {
+  font-size: 15px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+.legal ul { padding-left: 22px; }
+.legal a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+.legal a:hover { opacity: 0.75; text-decoration: underline; }
+.legal strong { color: var(--text); font-weight: 600; }
+.legal em { color: var(--text); font-style: normal; font-weight: 500; }
+.legal__card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px 28px;
+  margin: 16px 0 8px;
+}
+.legal__card p { margin-bottom: 6px; }
+@media (max-width: 640px) {
+  .legal {
+    padding: 32px 20px 56px;
+  }
+  .legal h1 { font-size: 26px; }
+  .legal h2 { font-size: 17px; margin: 28px 0 10px; }
+  .legal p, .legal li { font-size: 14.5px; }
+  .legal__card { padding: 18px 20px; }
+}
+
 /* ── Reduced motion ────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

@@ -338,29 +338,30 @@ import VelvzFace from './VelvzFace.astro';
       padding: 0;
     }
 
-    /* En móvil dejamos hueco negro arriba (~72 px) para que el iPhone
-       de la animación no se superponga con el header fijo. El video y
-       PNG arrancan tras esa franja en lugar de inset:0. */
+    /* En móvil dejamos el iPhone un pelín más pequeño que el contain
+       natural (88 %) y con origen ligeramente bajo (center 60 %) → la
+       reducción crea aire arriba para que no toque el header sin
+       reposicionar el elemento (lo que provocaba saltos al pintar). */
     .hero__video,
     .hero__final {
       position: absolute;
-      top: 72px;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      inset: 0;
       width: 100%;
-      height: calc(100% - 72px);
+      height: 100%;
       object-fit: contain;
       object-position: center;
-      transform: none; /* sin scale ni translate en móvil */
+      transform: scale(0.88);
+      transform-origin: center 60%;
       transition: none;
       will-change: auto;
     }
 
-    /* Override del slide desktop — en móvil no hay slide visual. */
+    /* Override del slide desktop — en móvil no hay slide visual, mantenemos
+       la escala 0.88 también durante is-sliding. */
     .hero.is-sliding .hero__video,
     .hero.is-sliding .hero__final {
-      transform: none;
+      transform: scale(0.88);
+      transform-origin: center 60%;
       height: 100%;
     }
 

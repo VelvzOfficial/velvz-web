@@ -125,9 +125,13 @@
 
     // Listener al evento `play` del vídeo: la forma más fiable de
     // ocultar el PNG inicial (solo dispara cuando el navegador empieza
-    // a reproducir de verdad).
+    // a reproducir de verdad). En móvil también marcamos `.is-playing`
+    // en el section, lo que dispara el fade-in del propio <video> (que
+    // hasta ese momento estaba a opacity 0 para que el primer fotograma
+    // no se viera "de fondo").
     const hideStart = () => {
       if (startImg) startImg.classList.add('is-hidden');
+      section.classList.add('is-playing');
     };
     video.addEventListener('play', hideStart, { once: true });
 
@@ -388,11 +392,21 @@
       object-position: center;
     }
 
-    /* En móvil ocultamos el panel-start (PNG del Mac cerrado) — el
-       primer frame del propio vídeo cubre esa función. Así evitamos
-       que el render del Mac aparezca como fondo durante la sección. */
+    /* En móvil ocultamos:
+        - panel-start (PNG del Mac cerrado)
+        - el propio <video> hasta que dispare play (el browser pintaba
+          el primer fotograma del vídeo como póster, y eso era lo que
+          se veía "de fondo" en el aviso del usuario).
+       Solo mostramos el video cuando JS añade `.is-playing` al section. */
     .panel__start {
       display: none;
+    }
+    .panel__video {
+      opacity: 0;
+      transition: opacity 0.25s ease-out;
+    }
+    .panel.is-playing .panel__video {
+      opacity: 1;
     }
 
     /* Drop del Mac: 3 s antes del end del vídeo, JS añade `.is-dropping`.
