@@ -23,7 +23,9 @@ const {
 // URL canónica por página — derivada de Astro.url y el dominio de producción
 const SITE = 'https://velvz.com';
 const canonicalURL = new URL(Astro.url.pathname, SITE).href;
-const ogImage = `${SITE}/velvz-icon.png`;
+// Banner 1200×630 dedicado para previews en redes (Twitter/Facebook/
+// Linkedin/iMessage). Fondo #050507 plano + icono y wordmark "Velvz".
+const ogImage = `${SITE}/og-banner.png`;
 
 // JSON-LD: combinación de schemas para máxima visibilidad en búsquedas
 //   - SoftwareApplication: rich card para "app de finanzas con IA"
@@ -134,8 +136,8 @@ const allSchemas = extraSchema
     <meta property="og:site_name" content="Velvz" />
     <meta property="og:locale" content="es_ES" />
     <meta property="og:image" content={ogImage} />
-    <meta property="og:image:width" content="1249" />
-    <meta property="og:image:height" content="1235" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Velvz — finanzas personales con IA" />
 
     <meta name="twitter:card" content="summary_large_image" />
