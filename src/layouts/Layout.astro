@@ -4,12 +4,105 @@ import '../styles/global.css';
 interface Props {
   title?: string;
   description?: string;
+  /** Datos extra que algunas páginas pueden inyectar — p. ej. /support
+      con su FAQPage. Si no se pasa, solo se emite el SoftwareApplication. */
+  extraSchema?: object;
 }
 
 const {
-  title = 'Velvz — Tu copiloto financiero, hecho para Apple',
-  description = 'Velvz conecta tu banco, organiza tu dinero con IA y te habla como un contable de confianza. Diseñada de cero para iPhone, iPad y Mac.',
+  // Title incluye keywords no-marca para entrar en búsquedas como "app
+  // finanzas personales IA Apple", "open banking España", "alternativa
+  // Mint" — además del término marca "Velvz". 60 chars (limit Google).
+  title = 'Velvz · App de finanzas personales con IA para Apple',
+  // Description con palabras clave densas: Open Banking PSD2, IA,
+  // privacidad iCloud, plataformas Apple. ≈156 chars (limit ~160).
+  description = 'App de finanzas personales con IA para iPhone, iPad y Mac. Conecta tu banco vía Open Banking (PSD2), organiza gastos con IA y guarda todo en tu iCloud privada.',
+  extraSchema,
 } = Astro.props;
+
+// URL canónica por página — derivada de Astro.url y el dominio de producción
+const SITE = 'https://velvz.com';
+const canonicalURL = new URL(Astro.url.pathname, SITE).href;
+const ogImage = `${SITE}/velvz-icon.png`;
+
+// JSON-LD: combinación de schemas para máxima visibilidad en búsquedas
+//   - SoftwareApplication: rich card para "app de finanzas con IA"
+//   - Organization: identidad de marca
+//   - WebSite: incluye SearchAction (sitelinks search box en Google)
+// Los emitimos en un único @graph para que Google los procese juntos.
+const baseSchemas = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'SoftwareApplication',
+      '@id': `${SITE}/#software`,
+      name: 'Velvz',
+      alternateName: 'Velvz Finanzas',
+      applicationCategory: 'FinanceApplication',
+      applicationSubCategory: 'PersonalFinance',
+      operatingSystem: 'iOS, iPadOS, macOS',
+      description: 'App de finanzas personales con IA para el ecosistema Apple. Conecta tu banco vía Open Banking PSD2 en modo solo lectura, categoriza gastos automáticamente, detecta suscripciones, te avisa de cargos anómalos y guarda los datos exclusivamente en tu iCloud privada (privacy-first).',
+      url: SITE,
+      image: ogImage,
+      inLanguage: 'es-ES',
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'EUR',
+        availability: 'https://schema.org/LimitedAvailability',
+        description: 'Acceso por invitación durante la fase beta privada',
+      },
+      featureList: [
+        'Conexión bancaria vía Open Banking PSD2 (solo lectura)',
+        'Categorización automática de movimientos con IA',
+        'Detección automática de suscripciones recurrentes',
+        'Asistente IA conversacional (Claude)',
+        'Almacenamiento en iCloud privado (CloudKit)',
+        'Disponible en iPhone, iPad y Mac',
+      ],
+      audience: {
+        '@type': 'Audience',
+        geographicArea: {
+          '@type': 'AdministrativeArea',
+          name: 'Europa',
+        },
+      },
+      publisher: { '@id': `${SITE}/#org` },
+    },
+    {
+      '@type': 'Organization',
+      '@id': `${SITE}/#org`,
+      name: 'Velvz',
+      url: SITE,
+      logo: { '@type': 'ImageObject', url: ogImage, width: 1249, height: 1235 },
+      foundingLocation: {
+        '@type': 'Place',
+        address: { '@type': 'PostalAddress', addressCountry: 'ES' },
+      },
+      contactPoint: {
+        '@type': 'ContactPoint',
+        contactType: 'customer support',
+        email: 'contact@velvz.com',
+        availableLanguage: ['es', 'en'],
+      },
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${SITE}/#website`,
+      url: SITE,
+      name: 'Velvz',
+      description: 'App de finanzas personales con IA para Apple',
+      inLanguage: 'es-ES',
+      publisher: { '@id': `${SITE}/#org` },
+    },
+  ],
+};
+
+// Si una página inyecta extraSchema (p.ej. FAQPage en /support), lo
+// metemos en el mismo @graph para que se publique como un solo bloque.
+const allSchemas = extraSchema
+  ? { ...baseSchemas, '@graph': [...baseSchemas['@graph'], extraSchema] }
+  : baseSchemas;
 ---
 
 <!doctype html>
@@ -23,6 +116,7 @@ const {
     <title>{title}</title>
     <meta name="description" content={description} />
 
+    <link rel="canonical" href={canonicalURL} />
     <link rel="icon" type="image/png" href="/velvz-icon.png" />
     <link rel="apple-touch-icon" href="/velvz-icon.png" />
 
@@ -36,12 +130,22 @@ const {
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content="https://velvz.com" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:site_name" content="Velvz" />
     <meta property="og:locale" content="es_ES" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1249" />
+    <meta property="og:image:height" content="1235" />
+    <meta property="og:image:alt" content="Velvz — finanzas personales con IA" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- Structured data: SoftwareApplication + Organization + WebSite
+         (+ FAQPage en /support) en un solo @graph. -->
+    <script type="application/ld+json" set:html={JSON.stringify(allSchemas)} />
   </head>
   <body>
     <slot />

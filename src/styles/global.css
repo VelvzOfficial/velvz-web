@@ -219,6 +219,12 @@ button, input, textarea { font-family: inherit; color: inherit; }
   color: var(--text);
   margin: 36px 0 12px;
 }
+.legal h3 {
+  font-size: clamp(15.5px, 1.9vw, 17px);
+  font-weight: 600;
+  color: var(--text);
+  margin: 24px 0 8px;
+}
 .legal p,
 .legal li {
   font-size: 15px;
